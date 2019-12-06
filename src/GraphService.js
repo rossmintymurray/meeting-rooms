@@ -18,7 +18,7 @@ function getAPIPath(room) {
     var email = "";
     //Get email address flr selected room
     if (room === "conference-room") {
-        email = "confroom@aspin.co.uk";
+        email = "newconfroom3@aspin4.onmicrosoft.com";
     } else  if (room === "meeting-room") {
         email = "oldconfroom3@aspin4.onmicrosoft.com";
     } else  if (room === "goldfish-bowl") {
@@ -56,7 +56,7 @@ export async function getNowEvent(accessToken, now, room) {
 
     const events = await client
         .api(getAPIPath(room))
-        .filter("start/dateTime ge '" +  now +"' & end/dateTime le '"+ now +"'")
+        .filter("start/dateTime le '" +  now +"' and end/dateTime ge '"+ now +"'")
         .orderby('start/dateTime ASC')
         .top(1)
         .get();

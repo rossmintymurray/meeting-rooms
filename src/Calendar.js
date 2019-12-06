@@ -54,7 +54,7 @@ export default class Calendar extends React.Component {
             // Update the array of events in state
             this.setState({events: events.value});
 
-            var now = await getNowEvent(accessToken, moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss'), moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
+            var now = await getNowEvent(accessToken,  moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
             // Update the array of events in state
             this.setState({now: now.value});
 
@@ -78,6 +78,20 @@ export default class Calendar extends React.Component {
         });
     }
 
+    getRoomName(room) {
+        var roomName = "";
+        if (room === "conference-room") {
+            roomName = "Conference Room";
+        } else  if (room === "meeting-room") {
+            roomName = "Meeting Room";
+        } else  if (room === "goldfish-bowl") {
+            roomName = "Goldfish Bowl";
+        } else {
+            return "/me/events";
+        }
+
+        return roomName;
+    }
 
     render() {
         return (
@@ -88,7 +102,7 @@ export default class Calendar extends React.Component {
                         <Col xs={3} className="text-right"><h1>{this.state.time}</h1></Col>
                     </Row>
                     <Row>
-                        <Col xs={12} className="text-center"><h1 className="room-name">{this.props.user.displayName}</h1></Col>
+                        <Col xs={12} className="text-center"><h1 className="room-name">{this.getRoomName(this.props.match.params.room)}</h1></Col>
                     </Row>
                 </Container>
                 <Container>
@@ -102,7 +116,10 @@ export default class Calendar extends React.Component {
                                 var endTime = moment(event.end.dateTime);
                                 var now = moment();
 
+                                let link = "/calendar/" + this.props.match.params.room + "/start-meeting";
+
                                 if(now.isBetween(startTime, endTime)){
+                                    console.log("DONE");
                                     return(
                                         <>
                                             <Col xs="8"><h3>{event.subject}</h3></Col>
@@ -110,12 +127,14 @@ export default class Calendar extends React.Component {
                                             <Col xs={12}><h5><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h5></Col>
                                         </>
                                     );
+
                                 } else {
+
                                     return(
                                         <>
                                             <Col xs="8"><h3>Room Available</h3></Col>
                                             <Col xs="4" className="text-right">
-                                                <Link to="/start-meeting">
+                                                <Link to={link}>
                                                     <Button variant="success" size="lg">Start Meeting</Button>
                                                 </Link>
 
@@ -123,6 +142,7 @@ export default class Calendar extends React.Component {
 
                                         </>
                                     )
+
                                 }
 
                             })

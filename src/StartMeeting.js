@@ -38,7 +38,8 @@ export default class StartMeeting extends React.Component {
             show: false,
             time: getTime(),
             email: '',
-            subject: ''
+            subject: '',
+            selectedButton: null
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -46,6 +47,8 @@ export default class StartMeeting extends React.Component {
     }
 
     async componentDidMount() {
+
+        //Set the interval for the clock tick
         this.intervalID = setInterval(
             () => this.tick(),
              1000
@@ -57,7 +60,7 @@ export default class StartMeeting extends React.Component {
             });
 
             // Get the book until options (times that the room is bookable until in 15 min increments)
-            var bookUntil = await getBookUntilOptions(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'));
+            var bookUntil = await getBookUntilOptions(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room );
 
             // Update the array of events in state
             this.setState({bookUntil: bookUntil.value});
@@ -94,7 +97,6 @@ export default class StartMeeting extends React.Component {
                 now = (moment(now).add(15, 'minutes'));
             }
 
-            console.log(times);
             // Update the array of events in state
             this.setState({times: times});
         }
@@ -122,12 +124,6 @@ export default class StartMeeting extends React.Component {
         });
     }
 
-    selectTime(event) {
-
-        console.log(event);
-
-    }
-
     handleSubmit(event) {
 
         //Call the Graph command to create a new booking from now
@@ -140,9 +136,53 @@ export default class StartMeeting extends React.Component {
 
         //Return confirm message (sweetalert)
 
-        alert('A name was submitted: ' + this.state.subject +" - " + this.state.email);
+        var event = {
+            "subject": this.state.subject,
+            "body": {
+                "contentType": "HTML",
+                "content": ""
+            },
+            "start": {
+                "dateTime": moment(this.state.time),
+                "timeZone": "GMT"
+            },
+            "end": {
+                "dateTime": moment(this.state.selectedButton),
+                "timeZone": "GMT"
+            },
+            "location": {
+                "displayName": this.getRoomName(this.props.match.params.room)
+            },
+            "attendees": [{
+                "emailAddress": {
+                    "address": "rossm@aspin.co.uk",
+                    "name": "Ross Murray"
+                },
+                "type": "required"
+            }]
+        }
+
+        alert('A name was submitted: ' + this.state.time  + " - " + this.state.subject +" - " + this.state.email + " - " + moment(this.state.selectedButton).format("HH:mm"));
         //Prevent the default submit
         event.preventDefault();
+    }
+
+    getRoomName(room) {
+        var roomName = "";
+        if (room === "conference-room") {
+            roomName = "Conference Room";
+        } else  if (room === "meeting-room") {
+            roomName = "Meeting Room";
+        } else  if (room === "goldfish-bowl") {
+            roomName = "Goldfish Bowl";
+        } else {
+            return "/me/events";
+        }
+        return roomName;
+    }
+
+    buttonSelected = selectedButton => ev => {
+        this.setState({ selectedButton })
     }
 
     render() {
@@ -155,7 +195,7 @@ export default class StartMeeting extends React.Component {
                         <Col xs={3} className="text-right"><h1>{this.state.time}</h1></Col>
                     </Row>
                     <Row>
-                        <Col xs={12} className="text-center"><h1 className="room-name">{this.props.user.displayName}</h1></Col>
+                        <Col xs={12} className="text-center"><h1 className="room-name">{this.getRoomName(this.props.match.params.room)}</h1></Col>
                     </Row>
                 </Container>
                 <Container>
@@ -168,7 +208,11 @@ export default class StartMeeting extends React.Component {
 
                                 {this.state.times.map((hours) => {
 
-                                    var row = hours.map(time => <Col xs={3}><Button variant="secondary" size="lg" onClick={this.selectTime}>{formatDateTime(time)}</Button></Col>);
+                                    var row = hours.map(time =>
+                                        <Col xs={3}>
+                                            <Button className={time === this.state.selectedButton ? 'selected' : ''} variant="secondary" size="lg" key={time} onClick={this.buttonSelected(time)}>{formatDateTime(time)}</Button>
+                                        </Col>
+                                    );
                                     return <Row>{row}</Row>;
                                 })}
                             </Col>

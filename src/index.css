@@ -77,3 +77,16 @@ input[type=submit] {
     color:#fff;
     text-decoration: none;
 }
+
+button.btn-secondary.selected {
+    background-color:#28a745;
+    border-color:#28a745;
+}
+
+.bg-image {
+    position: absolute;
+    top:0;
+    height:1024px;
+    width:768px;
+    opacity: 0.3;
+}
