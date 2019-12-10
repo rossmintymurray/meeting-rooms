@@ -113,9 +113,6 @@ class App extends Component {
                             <Col xs={9}><h2><Link className="home-link" to="/">{getTodaysDate()}</Link></h2></Col>
                             <Col xs={3} className="text-right"><h1>{this.state.time}</h1></Col>
                         </Row>
-                        <Row>
-                            <Col xs={12} className="text-center"><h1 className="room-name"></h1></Col>
-                        </Row>
                     </Container>
                     <Container>
                         {error}

@@ -29,12 +29,19 @@ export default class Calendar extends React.Component {
             next:[],
             now:[],
             show: false,
+            room_name: ""
 
         };
     }
 
     async componentDidMount() {
         try {
+
+            //Get room name
+            var room_name = await this.getRoomName(this.props.match.params.room);
+            // Update the array of events in state
+            this.setState({room_name: room_name});
+
             // Get the user's access token
             var accessToken = await window.msal.acquireTokenSilent({
                 scopes: config.scopes
@@ -53,6 +60,8 @@ export default class Calendar extends React.Component {
             var next = await getNextEvent(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
             // Update the array of events in state
             this.setState({next: next.value});
+
+
 
             //Set the update interval of events
             this.intervalID = setInterval(
@@ -102,7 +111,7 @@ export default class Calendar extends React.Component {
         } else  if (room === "goldfish-bowl") {
             roomName = "Goldfish Bowl";
         } else {
-            return "/me/events";
+            return "Ross Murray";
         }
 
         return roomName;
@@ -114,10 +123,14 @@ export default class Calendar extends React.Component {
         const link = "/calendar/" + this.props.match.params.room + "/start-meeting";
         return (
             <div>
-
+                <Container>
+                    <Row>
+                        <Col xs={12} className="text-center"><h1 className="room-name">{this.state.room_name}</h1></Col>
+                    </Row>
+                </Container>
                 <Container>
                     <Row className="section now">
-                        <Col xs={12}><h6>Now</h6></Col>
+                        <Col xs={12}><h5>Now</h5></Col>
 
                         {nowLength > 0 ? (
 
@@ -128,9 +141,17 @@ export default class Calendar extends React.Component {
 
                                         return(
                                             <>
-                                                <Col xs="8"><h3>{event.subject}</h3></Col>
-                                                <Col xs="4" className="text-right"><h5>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h5></Col>
-                                                <Col xs="12"><h5><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h5></Col>
+                                                <Col xs="8"><h2>{event.subject}</h2></Col>
+                                                <Col xs="4" className="text-right">
+                                                    <h4>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h4>
+
+                                                </Col>
+                                                <Col xs="12"><h4><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h4></Col>
+                                                <Col xs="3"><Button variant="secondary" size="md">Extend Meeting</Button></Col>
+                                                <Col xs="3"><Button variant="secondary" size="md">End Meeting</Button></Col>
+
+
+
                                             </>
                                         );
 
@@ -138,7 +159,7 @@ export default class Calendar extends React.Component {
 
                                         return(
                                             <>
-                                                <Col xs="8"><h3>Room Available</h3></Col>
+                                                <Col xs="8"><h2>Room Available</h2></Col>
                                                 <Col xs="4" className="text-right">
                                                     <Link to={link}>
                                                         <Button variant="success" size="lg">Start Meeting</Button>
@@ -156,14 +177,14 @@ export default class Calendar extends React.Component {
 
                         ) :
                             (
-                           <>
-                            <Col xs="8"><h3>Room Available</h3></Col>
-                            <Col xs="4" className="text-right">
-                            <Link to={link}>
-                            <Button variant="success" size="lg">Start Meeting</Button>
-                            </Link>
+                            <>
+                                <Col xs="8"><h2>Room Available</h2></Col>
+                                <Col xs="4" className="text-right">
+                                <Link to={link}>
+                                <Button variant="success" size="lg">Start Meeting</Button>
+                                </Link>
 
-                            </Col>
+                                </Col>
 
                             </>
                             )
@@ -187,9 +208,9 @@ export default class Calendar extends React.Component {
                                 if(now.isBefore(startTime)){
                                     return(
                                         <>
-                                            <Col xs="8"><h3>{event.subject}</h3></Col>
-                                            <Col xs="4" className="text-right"><h5>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h5></Col>
-                                            <Col xs={12}><h5><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h5></Col>
+                                            <Col xs="8"><h4>{event.subject}</h4></Col>
+                                            <Col xs="4" className="text-right"><h6>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h6></Col>
+                                            <Col xs={12}><h6><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h6></Col>
                                         </>
                                     )
                                 }
@@ -243,6 +264,66 @@ export default class Calendar extends React.Component {
                         </Col>
                     </Row>
                 </Container>
+
+                {/*<Container>*/}
+                {/*    <Row className="section tomorrow">*/}
+                {/*        <Col xs={12}><h6>Tomorrow</h6></Col>*/}
+                {/*    </Row>*/}
+                {/*    <Row>*/}
+                {/*        <Col>*/}
+                {/*            <Table>*/}
+                {/*                <thead>*/}
+                {/*                <tr>*/}
+                {/*                    <th scope="col">Organiser</th>*/}
+                {/*                    <th scope="col">Subject</th>*/}
+                {/*                    <th scope="col">Start</th>*/}
+                {/*                    <th scope="col">End</th>*/}
+                {/*                </tr>*/}
+                {/*                </thead>*/}
+                {/*                <tbody>*/}
+                {/*                {this.state.events.map(*/}
+                {/*                    function(event){*/}
+
+                {/*                        var style = "";*/}
+                {/*                        if(moment(event.start.dateTime).isAfter(moment(now()).add(1, 'day').startOf('day'))) {*/}
+
+                {/*                            return (*/}
+                {/*                                <tr className={style} key={event.id}>*/}
+                {/*                                    <td>{event.organizer.emailAddress.name}</td>*/}
+                {/*                                    <td>{event.subject}</td>*/}
+                {/*                                    <td>{formatDateTime(event.start.dateTime)}</td>*/}
+                {/*                                    <td>{formatDateTime(event.end.dateTime)}</td>*/}
+                {/*                                </tr>*/}
+                {/*                            );*/}
+                {/*                        }*/}
+                {/*                    })}*/}
+                {/*                </tbody>*/}
+                {/*            </Table>*/}
+                {/*        </Col>*/}
+                {/*    </Row>*/}
+                {/*</Container>*/}
+
+                <Container>
+                    <Row className="section action">
+                        <Col xs="4">
+                            <Link to="/">
+                                <Button className="col-12" variant="secondary" size="lg">Back</Button>
+                            </Link>
+
+                        </Col>
+                        <Col xs="4">
+                            <Link to={link}>
+                                <Button className="col-12" variant="primary" size="lg">Book</Button>
+                            </Link>
+                        </Col>
+                        <Col xs="4">
+                            <Link to={link}>
+                                <Button className="col-12" variant="success" size="lg">Find a room</Button>
+                            </Link>
+                        </Col>
+                    </Row>
+                </Container>
+
             </div>
         );
     }

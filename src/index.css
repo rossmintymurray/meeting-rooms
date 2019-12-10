@@ -34,7 +34,7 @@ tr.expired {
     margin-top:50px;
 }
 
-.section h6, .light {
+.section h6, .section h5, .light {
     font-weight:300;
 }
 
@@ -91,3 +91,12 @@ button.btn-secondary.selected {
     width:768px;
     opacity: 0.3;
 }
+
+.action {
+    position:absolute;
+    bottom:40px;
+    width:690px;
+
+}
+
+

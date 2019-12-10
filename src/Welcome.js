@@ -13,16 +13,16 @@ function WelcomeContent(props) {
             <div>
                 <Row className="text-center">
                     <Col>
-                        <Link className="btn btn-primary btn-lg" to="/calendar/conference-room">Conference Room</Link>
+                        <Link className="btn btn-secondary btn-lg" to="/calendar/conference-room">Conference Room</Link>
                     </Col>
                     <Col>
-                        <Link className="btn btn-primary btn-lg" to="/calendar/meeting-room">Meeting Room</Link>
+                        <Link className="btn btn-secondary btn-lg" to="/calendar/meeting-room">Meeting Room</Link>
                     </Col>
                     <Col>
-                        <Link className="btn btn-primary btn-lg" to="/calendar/goldfish-bowl">Goldfish Bowl</Link>
+                        <Link className="btn btn-secondary btn-lg" to="/calendar/goldfish-bowl">Goldfish Bowl</Link>
                     </Col>
                     <Col>
-                        <Link className="btn btn-primary btn-lg" to="/calendar/ross-test">Ross Test</Link>
+                        <Link className="btn btn-secondary btn-lg" to="/calendar/ross-test">Ross Test</Link>
                     </Col>
                 </Row>
             </div>
