@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from "react-dom"
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { Container } from 'reactstrap';
+import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
+import {Col, Container, Row} from 'reactstrap';
 import ErrorMessage from './ErrorMessage';
 import Welcome from './Welcome';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -11,11 +11,25 @@ import {getEvents, getNextEvent, getNowEvent, getUserDetails} from './GraphServi
 import Calendar from './Calendar';
 import StartMeeting from './StartMeeting';
 import Unsplash from 'react-unsplash-wrapper'
+import moment from "moment";
 
+//Date and time functions (for displaying the header
+function getTodaysDate() {
+    return moment.utc().local().format('dddd, Do MMMM YYYY');
+}
+
+function getTime() {
+    return moment.utc().local().format(' h:mma');
+}
+
+//Start Class
 class App extends Component {
+
+    //Constructor
     constructor(props) {
         super(props);
 
+        //MS gRaph to get user
         this.userAgentApplication = new UserAgentApplication({
             auth: {
                 clientId: config.appId
@@ -26,23 +40,26 @@ class App extends Component {
             }
         });
 
+        //Set the user
         var user = this.userAgentApplication.getAccount();
 
+        //Set up states
         this.state = {
             isAuthenticated: (user !== null),
             user: {},
             error: null,
-            imageUrl: null
+            imageUrl: null,
+            time: getTime()
         };
 
+        //Get user details from Graph
         if (user) {
             // Enhance user object with data from Graph
             this.getUserProfile();
         }
     }
 
-
-
+    //On mount (load)
     async componentDidMount() {
 
         try {
@@ -50,21 +67,31 @@ class App extends Component {
             var accessToken = await window.msal.acquireTokenSilent({
                 scopes: config.scopes
             });
-
         }
         catch(err) {
-                this.props.showError('ERROR', JSON.stringify(err));
-            }
+            alert("there has been a problem loading the user")
+        }
+
+        this.intervalID = setInterval(
+            () => this.tick(),
+            1000
+        );
+
     }
 
+    //On un mount
     componentWillUnmount() {
         clearInterval(this.intervalID);
     }
 
-    handleFinishedUploading = imageUrl => {
-        this.setState({ imageUrl });
+    //Ticking clock
+    tick() {
+        this.setState({
+            time: getTime()
+        });
     }
 
+    //Build the page
     render() {
         let error = null;
         if (this.state.error) {
@@ -77,10 +104,19 @@ class App extends Component {
 
 
             <Router>
-                <div class="bg-image">
+                <div className="bg-image">
                     <Unsplash width="768" height="1024" keywords="scenic, mountain, mountains"/>
                 </div>
                 <div>
+                    <Container>
+                        <Row className="header d-flex align-items-end" >
+                            <Col xs={9}><h2><Link className="home-link" to="/">{getTodaysDate()}</Link></h2></Col>
+                            <Col xs={3} className="text-right"><h1>{this.state.time}</h1></Col>
+                        </Row>
+                        <Row>
+                            <Col xs={12} className="text-center"><h1 className="room-name"></h1></Col>
+                        </Row>
+                    </Container>
                     <Container>
                         {error}
                         <Route exact path="/"
@@ -93,13 +129,16 @@ class App extends Component {
                         <Route exact path="/calendar/:room"
                                render={(props) =>
                                    <Calendar {...props}
+                                             isAuthenticated={this.state.isAuthenticated}
                                              user={this.state.user}
                                              showError={this.setErrorMessage.bind(this)} />
                                } />
                         <Route exact path="/calendar/:room/start-meeting"
                                render={(props) =>
                                    <StartMeeting {...props}
+                                             isAuthenticated={this.state.isAuthenticated}
                                              user={this.state.user}
+                                             time={this.state.time}
                                              showError={this.setErrorMessage.bind(this)} />
                                } />
                     </Container>

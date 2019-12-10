@@ -21,6 +21,9 @@ function WelcomeContent(props) {
                     <Col>
                         <Link className="btn btn-primary btn-lg" to="/calendar/goldfish-bowl">Goldfish Bowl</Link>
                     </Col>
+                    <Col>
+                        <Link className="btn btn-primary btn-lg" to="/calendar/ross-test">Ross Test</Link>
+                    </Col>
                 </Row>
             </div>
         );
@@ -64,12 +67,6 @@ export default class Welcome extends React.Component {
     render() {
         return (
             <div>
-                <Container>
-                    <Row className="header d-flex align-items-end" >
-                        <Col xs={9}><h2> <Link className="home-link" to="/">{getTodaysDate()}</Link></h2></Col>
-                        <Col xs={3} className="text-right"><h1>{this.state.time}</h1></Col>
-                    </Row>
-                </Container>
                 <Container>
 
                     <Row>

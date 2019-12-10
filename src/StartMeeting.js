@@ -3,7 +3,7 @@ import moment from 'moment';
 import config from './Config';
 
 import { getBookUntilOptions } from './GraphService';
-
+import { createEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
@@ -14,15 +14,6 @@ import {Link} from "react-router-dom";
 function formatDateTime(dateTime) {
     return moment.utc(dateTime).local().format('h:mma');
 }
-
-function getTodaysDate() {
-    return moment.utc().local().format('dddd, Do MMMM YYYY');
-}
-
-function getTime() {
-    return moment.utc().local().format(' h:mma');
-}
-
 
 export default class StartMeeting extends React.Component {
 
@@ -36,7 +27,6 @@ export default class StartMeeting extends React.Component {
             bookUntil:[],
             times:[],
             show: false,
-            time: getTime(),
             email: '',
             subject: '',
             selectedButton: null
@@ -48,11 +38,6 @@ export default class StartMeeting extends React.Component {
 
     async componentDidMount() {
 
-        //Set the interval for the clock tick
-        this.intervalID = setInterval(
-            () => this.tick(),
-             1000
-        );
         try {
             // Get the user's access token
             var accessToken = await window.msal.acquireTokenSilent({
@@ -74,7 +59,7 @@ export default class StartMeeting extends React.Component {
             var now = moment().minute(roundedUp).second(0);
             
             var  beforeTime = moment('08:30', "HH:mm");
-            var afterTime = moment('23:30', "HH:mm");
+            var afterTime = moment('21:30', "HH:mm");
 
             while(moment(now).isBefore(moment(this.state.bookUntil[0].start.dateTime))) {
 
@@ -86,10 +71,8 @@ export default class StartMeeting extends React.Component {
 
                     //Check if hour array exists
                     if(hour in times) {
-                        console.log(minute);
                         times[hour].push(now);
                     } else {
-                        console.log(hour);
                         times[hour] = [now];
                     }
                 }
@@ -110,11 +93,6 @@ export default class StartMeeting extends React.Component {
         clearInterval(this.intervalID);
     }
 
-    tick() {
-        this.setState({
-            time: getTime()
-        });
-    }
 
     handleChange(event) {
         this.setState({value: event.target.value});
@@ -136,19 +114,19 @@ export default class StartMeeting extends React.Component {
 
         //Return confirm message (sweetalert)
 
-        var event = {
+        var apiData = {
             "subject": this.state.subject,
             "body": {
                 "contentType": "HTML",
-                "content": ""
+                "content": "AMR Booked meeting"
             },
             "start": {
-                "dateTime": moment(this.state.time),
-                "timeZone": "GMT"
+                "dateTime": moment(this.props.time, "H:mma").format(),
+                "timeZone": "Europe/London"
             },
             "end": {
-                "dateTime": moment(this.state.selectedButton),
-                "timeZone": "GMT"
+                "dateTime": moment(this.state.selectedButton).format(),
+                "timeZone": "Europe/London"
             },
             "location": {
                 "displayName": this.getRoomName(this.props.match.params.room)
@@ -162,12 +140,23 @@ export default class StartMeeting extends React.Component {
             }]
         }
 
-        alert('A name was submitted: ' + this.state.time  + " - " + this.state.subject +" - " + this.state.email + " - " + moment(this.state.selectedButton).format("HH:mm"));
+
+        var accessToken =  window.msal.acquireTokenSilent({
+            scopes: config.scopes
+        });
+
+        console.log(apiData);
+
+        var result =  createEvent(accessToken,  apiData );
+
+        console.log(result);
+        alert('A name was submitted: ' + this.props.time  + " - " + this.state.subject +" - " + this.state.email + " - " + moment(this.state.selectedButton).format("HH:mm"));
         //Prevent the default submit
         event.preventDefault();
     }
 
     getRoomName(room) {
+        room = "";
         var roomName = "";
         if (room === "conference-room") {
             roomName = "Conference Room";
@@ -190,15 +179,6 @@ export default class StartMeeting extends React.Component {
         return (
             <div>
                 <Container>
-                    <Row className="header d-flex align-items-end" >
-                        <Col xs={9}><h2><Link className="home-link" to="/">{getTodaysDate()}</Link></h2></Col>
-                        <Col xs={3} className="text-right"><h1>{this.state.time}</h1></Col>
-                    </Row>
-                    <Row>
-                        <Col xs={12} className="text-center"><h1 className="room-name">{this.getRoomName(this.props.match.params.room)}</h1></Col>
-                    </Row>
-                </Container>
-                <Container>
 
                     <form onSubmit={this.handleSubmit}>
                         <fieldset>
@@ -206,14 +186,14 @@ export default class StartMeeting extends React.Component {
                             <Col xs={12}><h6>Select Meeting End Time</h6></Col>
                             <Col>
 
-                                {this.state.times.map((hours) => {
+                                {this.state.times.map((hours, i) => {
 
-                                    var row = hours.map(time =>
-                                        <Col xs={3}>
-                                            <Button className={time === this.state.selectedButton ? 'selected' : ''} variant="secondary" size="lg" key={time} onClick={this.buttonSelected(time)}>{formatDateTime(time)}</Button>
+                                    var row = hours.map((time, key) =>
+                                        <Col xs={3} key={key}>
+                                            <Button key={key} className={time === this.state.selectedButton ? 'selected' : ''} variant="secondary" size="lg" key={time} onClick={this.buttonSelected(time)}>{formatDateTime(time)}</Button>
                                         </Col>
                                     );
-                                    return <Row>{row}</Row>;
+                                    return <Row key={i}>{row}</Row>;
                                 })}
                             </Col>
 

@@ -16,13 +16,7 @@ function formatDateTime(dateTime) {
     return moment.utc(dateTime).local().format('h:mma');
 }
 
-function getTodaysDate() {
-    return moment.utc().local().format('dddd, Do MMMM YYYY');
-}
 
-function getTime() {
-    return moment.utc().local().format(' h:mma');
-}
 
 
 export default class Calendar extends React.Component {
@@ -35,33 +29,36 @@ export default class Calendar extends React.Component {
             next:[],
             now:[],
             show: false,
-            time: getTime()
+
         };
     }
 
     async componentDidMount() {
-        this.intervalID = setInterval(
-            () => this.tick(),
-            1000
-        );
         try {
             // Get the user's access token
             var accessToken = await window.msal.acquireTokenSilent({
                 scopes: config.scopes
             });
-            // Get the user's events
+            // Get the user's events (table)
             var events = await getEvents(accessToken, moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss'), moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
             // Update the array of events in state
             this.setState({events: events.value});
 
+            // Now event
             var now = await getNowEvent(accessToken,  moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
             // Update the array of events in state
             this.setState({now: now.value});
 
+            //Next event
             var next = await getNextEvent(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
             // Update the array of events in state
             this.setState({next: next.value});
 
+            //Set the update interval of events
+            this.intervalID = setInterval(
+                () => this.updateViewport(accessToken),
+                10000
+            );
         }
         catch(err) {
             this.props.showError('ERROR', JSON.stringify(err));
@@ -72,11 +69,29 @@ export default class Calendar extends React.Component {
         clearInterval(this.intervalID);
     }
 
-    tick() {
-        this.setState({
-            time: getTime()
-        });
+    updateViewport(accessToken) {
+        this.updateNow(accessToken);
+        this.updateNext(accessToken);
+        this.updateEvents(accessToken);
     }
+    updateNow(accessToken) {
+        getNowEvent(accessToken,  moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room).then(result => this.setState({
+            now: result.value
+        }))
+    }
+
+    updateNext(accessToken) {
+        getNextEvent(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room).then(result => this.setState({
+            next: result.value
+        }))
+    }
+
+    updateEvents(accessToken) {
+        getEvents(accessToken, moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss'), moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room).then(result => this.setState({
+            events: result.value
+        }))
+    }
+
 
     getRoomName(room) {
         var roomName = "";
@@ -94,59 +109,67 @@ export default class Calendar extends React.Component {
     }
 
     render() {
+
+        const nowLength = this.state.now.length;
+        const link = "/calendar/" + this.props.match.params.room + "/start-meeting";
         return (
             <div>
-                <Container>
-                    <Row className="header d-flex align-items-end" >
-                        <Col xs={9}><h2><Link className="home-link" to="/">{getTodaysDate()}</Link></h2></Col>
-                        <Col xs={3} className="text-right"><h1>{this.state.time}</h1></Col>
-                    </Row>
-                    <Row>
-                        <Col xs={12} className="text-center"><h1 className="room-name">{this.getRoomName(this.props.match.params.room)}</h1></Col>
-                    </Row>
-                </Container>
+
                 <Container>
                     <Row className="section now">
                         <Col xs={12}><h6>Now</h6></Col>
 
-                        {this.state.now.map((event, i) => {
-                                //Check start date is before now and end date is after now
+                        {nowLength > 0 ? (
 
-                                var startTime = moment(event.start.dateTime);
-                                var endTime = moment(event.end.dateTime);
-                                var now = moment();
+                            this.state.now.map((event, i) => {
+                                    //Check start date is before now and end date is after now
 
-                                let link = "/calendar/" + this.props.match.params.room + "/start-meeting";
+                                    if(moment().isBetween(moment(event.start.dateTime), moment(event.end.dateTime))){
 
-                                if(now.isBetween(startTime, endTime)){
-                                    console.log("DONE");
-                                    return(
-                                        <>
-                                            <Col xs="8"><h3>{event.subject}</h3></Col>
-                                            <Col xs="4" className="text-right"><h5>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h5></Col>
-                                            <Col xs={12}><h5><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h5></Col>
-                                        </>
-                                    );
+                                        return(
+                                            <>
+                                                <Col xs="8"><h3>{event.subject}</h3></Col>
+                                                <Col xs="4" className="text-right"><h5>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h5></Col>
+                                                <Col xs="12"><h5><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h5></Col>
+                                            </>
+                                        );
 
-                                } else {
+                                    } else {
 
-                                    return(
-                                        <>
-                                            <Col xs="8"><h3>Room Available</h3></Col>
-                                            <Col xs="4" className="text-right">
-                                                <Link to={link}>
-                                                    <Button variant="success" size="lg">Start Meeting</Button>
-                                                </Link>
+                                        return(
+                                            <>
+                                                <Col xs="8"><h3>Room Available</h3></Col>
+                                                <Col xs="4" className="text-right">
+                                                    <Link to={link}>
+                                                        <Button variant="success" size="lg">Start Meeting</Button>
+                                                    </Link>
 
-                                            </Col>
+                                                </Col>
 
-                                        </>
-                                    )
+                                            </>
+                                        )
 
-                                }
+                                    }
 
-                            })
-                        }
+                                })
+
+
+                        ) :
+                            (
+                           <>
+                            <Col xs="8"><h3>Room Available</h3></Col>
+                            <Col xs="4" className="text-right">
+                            <Link to={link}>
+                            <Button variant="success" size="lg">Start Meeting</Button>
+                            </Link>
+
+                            </Col>
+
+                            </>
+                            )
+                            }
+
+
 
 
                     </Row>

@@ -11,7 +11,7 @@ body {
     background-color: #282c34;
     color:#fff;
     padding-top:50px;
-    min-height:1100px;
+    min-height:1024px;
 }
 
 .table {
@@ -19,7 +19,7 @@ body {
 }
 
 tr.expired {
-    color:#7E7E7E;
+    color:#B3B3B3;
 }
 
 .header  {
@@ -84,7 +84,8 @@ button.btn-secondary.selected {
 }
 
 .bg-image {
-    position: absolute;
+    position: fixed;
+
     top:0;
     height:1024px;
     width:768px;
