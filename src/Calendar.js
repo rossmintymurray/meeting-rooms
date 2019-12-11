@@ -16,9 +16,6 @@ function formatDateTime(dateTime) {
     return moment.utc(dateTime).local().format('h:mma');
 }
 
-
-
-
 export default class Calendar extends React.Component {
 
     constructor(props) {
@@ -47,7 +44,7 @@ export default class Calendar extends React.Component {
                 scopes: config.scopes
             });
             // Get the user's events (table)
-            var events = await getEvents(accessToken, moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss'), moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
+            var events = await getEvents(accessToken, moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss'), moment().endOf('day').add(1, 'minutes').format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
             // Update the array of events in state
             this.setState({events: events.value});
 
@@ -143,12 +140,12 @@ export default class Calendar extends React.Component {
                                             <>
                                                 <Col xs="8"><h2>{event.subject}</h2></Col>
                                                 <Col xs="4" className="text-right">
-                                                    <h4>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h4>
+                                                    <h5>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h5>
 
                                                 </Col>
-                                                <Col xs="12"><h4><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h4></Col>
-                                                <Col xs="3"><Button variant="secondary" size="md">Extend Meeting</Button></Col>
-                                                <Col xs="3"><Button variant="secondary" size="md">End Meeting</Button></Col>
+                                                <Col xs="8"><h4><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h4></Col>
+                                                <Col xs="2"><Button className="col-12" variant="success" size="sm">Extend </Button></Col>
+                                                <Col xs="2"><Button className="col-12" variant="error" size="sm">End</Button></Col>
 
 
 
@@ -174,14 +171,13 @@ export default class Calendar extends React.Component {
 
                                 })
 
-
                         ) :
                             (
                             <>
                                 <Col xs="8"><h2>Room Available</h2></Col>
                                 <Col xs="4" className="text-right">
                                 <Link to={link}>
-                                <Button variant="success" size="lg">Start Meeting</Button>
+                                    <Button variant="success" size="lg">Start Meeting</Button>
                                 </Link>
 
                                 </Col>
@@ -231,7 +227,7 @@ export default class Calendar extends React.Component {
                     <Row className="section today">
                         <Col xs={12}><h6>Today</h6></Col>
                     </Row>
-                    <Row>
+                    <Row className="today-table">
                         <Col>
                             <Table>
                                 <thead>
@@ -307,7 +303,7 @@ export default class Calendar extends React.Component {
                     <Row className="section action">
                         <Col xs="4">
                             <Link to="/">
-                                <Button className="col-12" variant="secondary" size="lg">Back</Button>
+                                <Button className="col-12" variant="primary" size="lg">Back</Button>
                             </Link>
 
                         </Col>
@@ -318,7 +314,7 @@ export default class Calendar extends React.Component {
                         </Col>
                         <Col xs="4">
                             <Link to={link}>
-                                <Button className="col-12" variant="success" size="lg">Find a room</Button>
+                                <Button className="col-12" variant="primary" size="lg">Find a room</Button>
                             </Link>
                         </Col>
                     </Row>

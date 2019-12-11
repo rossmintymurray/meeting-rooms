@@ -1,5 +1,6 @@
 body {
-
+position:fixed;
+    width:768px;
 }
 
 .alert-pre {
@@ -9,13 +10,13 @@ body {
 }
 #root {
     background-color: #282c34;
-    color:#fff;
+    color:#F8F9F8;
     padding-top:50px;
     min-height:1024px;
 }
 
 .table {
-    color:#fff !important;
+    color:#F8F9F8 !important;
 }
 
 tr.expired {
@@ -27,11 +28,11 @@ tr.expired {
 }
 
 .room-name {
-    margin-top:30px;
+    margin-top:20px;
 }
 
 .section {
-    margin-top:50px;
+    margin-top:30px;
 }
 
 .section h6, .section h5, .light {
@@ -59,28 +60,29 @@ input[type=submit] {
 }
 
 .home-link {
-    color:#fff;
+    color:#F8F9F8;
     text-decoration: none;
 }
 
 .home-link:hover {
-    color:#fff;
+    color:#F8F9F8;
     text-decoration: none;
 }
 
+
 .home-link:active {
-    color:#fff;
+    color:#F8F9F8;
     text-decoration: none;
 }
 
 .home-link:visited {
-    color:#fff;
+    color:#F8F9F8;
     text-decoration: none;
 }
 
 button.btn-secondary.selected {
-    background-color:#28a745;
-    border-color:#28a745;
+    background-color:#238276;
+    border-color:#238276;
 }
 
 .bg-image {
@@ -93,10 +95,75 @@ button.btn-secondary.selected {
 }
 
 .action {
-    position:absolute;
+    position:fixed;
     bottom:40px;
     width:690px;
 
+}
+
+.container .btn-primary {
+    color: #fff;
+    background-color: #264653;
+    border-color: #264653;
+}
+
+.container .btn-primary:hover {
+    color: #fff;
+    background-color: #1D353F;
+    border-color: #1D353F;
+}
+
+.container .btn-primary:not(:disabled):not(.disabled):active:active {
+    color: #fff;
+    background-color: #1D353F;
+    border-color: #1D353F;
+}
+
+.container .btn-primary:visited {
+    color: #fff;
+    background-color: #1D353F;
+    border-color: #1D353F;
+}
+
+.container .btn-success {
+    color: #fff;
+    background-color: #238276;
+    border-color: #238276;
+}
+
+.container .btn-success:hover {
+    color: #fff;
+    background-color: #1B665D;
+    border-color: #1B665D;
+}
+
+.container .btn-success:not(:disabled):not(.disabled):active:active {
+    color: #fff;
+    background-color: #1B665D;
+    border-color: #1B665D;
+}
+
+.container .btn-success:visited {
+    color: #fff;
+    background-color: #1B665D;
+    border-color: #1B665D;
+}
+
+.container .btn-error {
+    color: #fff;
+    background-color: #E76F51;
+    border-color: #E76F51;
+}
+
+.container .btn-warning {
+    color: #fff;
+    background-color: #F4A261;
+    border-color: #F4A261;
+}
+
+.today-table {
+    height:410px;
+    overflow: scroll;
 }
 
 

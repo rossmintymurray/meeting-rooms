@@ -29,7 +29,8 @@ export default class StartMeeting extends React.Component {
             show: false,
             email: '',
             subject: '',
-            selectedButton: null
+            selectedButton: null,
+            room_name: ""
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -39,6 +40,11 @@ export default class StartMeeting extends React.Component {
     async componentDidMount() {
 
         try {
+            //Get room name
+            var room_name = await this.getRoomName(this.props.match.params.room);
+            // Update the array of events in state
+            this.setState({room_name: room_name});
+
             // Get the user's access token
             var accessToken = await window.msal.acquireTokenSilent({
                 scopes: config.scopes
@@ -59,7 +65,7 @@ export default class StartMeeting extends React.Component {
             var now = moment().minute(roundedUp).second(0);
             
             var  beforeTime = moment('08:30', "HH:mm");
-            var afterTime = moment('21:30', "HH:mm");
+            var afterTime = moment('23:30', "HH:mm");
 
             while(moment(now).isBefore(moment(this.state.bookUntil[0].start.dateTime))) {
 
@@ -156,7 +162,6 @@ export default class StartMeeting extends React.Component {
     }
 
     getRoomName(room) {
-        room = "";
         var roomName = "";
         if (room === "conference-room") {
             roomName = "Conference Room";
@@ -165,7 +170,7 @@ export default class StartMeeting extends React.Component {
         } else  if (room === "goldfish-bowl") {
             roomName = "Goldfish Bowl";
         } else {
-            return "/me/events";
+            return "Ross Murray 2";
         }
         return roomName;
     }
@@ -178,6 +183,11 @@ export default class StartMeeting extends React.Component {
 
         return (
             <div>
+                <Container>
+                    <Row>
+                        <Col xs={12} className="text-center"><h1 className="room-name">{this.state.room_name}</h1></Col>
+                    </Row>
+                </Container>
                 <Container>
 
                     <form onSubmit={this.handleSubmit}>
