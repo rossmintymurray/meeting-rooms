@@ -65,7 +65,7 @@ export default class StartMeeting extends React.Component {
             var now = moment().minute(roundedUp).second(0);
             
             var  beforeTime = moment('08:30', "HH:mm");
-            var afterTime = moment('23:30', "HH:mm");
+            var afterTime = moment('23:45', "HH:mm").add(1, "minute");
 
             while(moment(now).isBefore(moment(this.state.bookUntil[0].start.dateTime))) {
 
@@ -120,29 +120,29 @@ export default class StartMeeting extends React.Component {
 
         //Return confirm message (sweetalert)
 
-        var apiData = {
-            "subject": this.state.subject,
-            "body": {
-                "contentType": "HTML",
-                "content": "AMR Booked meeting"
+        const apiData = {
+            subject: this.state.subject,
+            body: {
+                contentType: "HTML",
+                content: "AMR Booked meeting"
             },
-            "start": {
-                "dateTime": moment(this.props.time, "H:mma").format(),
-                "timeZone": "Europe/London"
+            start: {
+                dateTime: moment(this.props.time, "H:mma").format(),
+                timeZone: "GMT Standard Time"
             },
-            "end": {
-                "dateTime": moment(this.state.selectedButton).format(),
-                "timeZone": "Europe/London"
+            end: {
+                dateTime: moment(this.state.selectedButton).format(),
+                timeZone: "GMT Standard Time"
             },
-            "location": {
-                "displayName": this.getRoomName(this.props.match.params.room)
+            location: {
+                displayName: this.getRoomName(this.props.match.params.room)
             },
-            "attendees": [{
-                "emailAddress": {
-                    "address": "rossm@aspin.co.uk",
-                    "name": "Ross Murray"
+            attendees: [{
+                emailAddress: {
+                    address: "rossm@aspin.co.uk",
+                    name: "Ross Murray"
                 },
-                "type": "required"
+                type: "required"
             }]
         }
 
@@ -151,14 +151,31 @@ export default class StartMeeting extends React.Component {
             scopes: config.scopes
         });
 
-        console.log(apiData);
-
-        var result =  createEvent(accessToken,  apiData );
-
-        console.log(result);
-        alert('A name was submitted: ' + this.props.time  + " - " + this.state.subject +" - " + this.state.email + " - " + moment(this.state.selectedButton).format("HH:mm"));
-        //Prevent the default submit
         event.preventDefault();
+
+        //Resolve access token promise so we can send the accessToken value to MS Graph
+        Promise.resolve(accessToken)
+            .then((res) => {
+                //Post event
+                var result =  createEvent(res.accessToken,  apiData, this.props.match.params.room );
+
+                Promise.resolve(result)
+                    .then((res2) => {
+
+                        //Check for success
+                        if(res2.status === 201) {
+                            //Redirect to calendar page
+                            this.props.history.push('/calendar/' + this.props.match.params.room);
+                        }
+                //Check iff reseult was successful and return to
+                    });
+
+            });
+
+
+        //alert('A name was submitted: ' + this.props.time  + " - " + this.state.subject +" - " + this.state.email + " - " + moment(this.state.selectedButton).format("HH:mm"));
+        //Prevent the default submit
+
     }
 
     getRoomName(room) {

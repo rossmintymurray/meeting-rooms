@@ -105,7 +105,7 @@ class App extends Component {
 
             <Router>
                 <div className="bg-image">
-                    <Unsplash width="768" height="1024" keywords="scenic, mountain, mountains"/>
+                    <Unsplash width="768" height="1024" keywords="scenic, mountain, mountains, landscape, nature"/>
                 </div>
                 <div>
                     <Container>

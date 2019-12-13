@@ -1,3 +1,4 @@
+import axios from 'axios';
 var graph = require('@microsoft/microsoft-graph-client');
 
 
@@ -87,53 +88,27 @@ export async function getBookUntilOptions(accessToken, now, room) {
         .top(1)
         .get();
 
-
     return events;
 }
 
-export async function createEvent(accessToken, apiData) {
+export async function createEvent(accessToken, apiData, room) {
 
-
-
-    const client = getAuthenticatedClient(accessToken);
-
-    const event = {
-        subject: "Let's go for lunch",
-        body: {
-            contentType: "HTML",
-            content: "Does late morning work for you?"
-        },
-        start: {
-            dateTime: "2019-12-16T12:00:00",
-            timeZone: "Pacific Standard Time"
-        },
-        end: {
-            dateTime: "2019-12-16T14:00:00",
-            timeZone: "Pacific Standard Time"
-        },
-        location:{
-            displayName:"Harry's Bar"
-        },
-        attendees: [
-            {
-                emailAddress: {
-                    address:"rossm@aspin.co.uk",
-                    name: "Ross Murray"
-                },
-                type: "required"
-            }
-        ]
+    let result = [];
+    //Set up headers and access token
+    let config = {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: 'Bearer ' + accessToken
+        }
     };
-    //
-    // let res = await client.api('/groups/01d4ee64-15ce-491e-bad1-b91aa3223df4/events')
-    //     .post(event);
 
-    let res = await client
-        .api('/me/events')
-        .post(event);
+    //Post data to api
+    await axios.post('https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)), apiData,config)
+        .then(res => {
+            result = res;
+        });
 
-console.log(res);
+    return result;
 
-    return res;
 }
 
