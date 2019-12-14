@@ -3,32 +3,27 @@ import moment from 'moment';
 import config from './Config';
 
 import { getBookUntilOptions } from './GraphService';
-import { createEvent } from './GraphService';
+import { updateEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
 import { Button } from 'react-bootstrap';
-import {Link} from "react-router-dom";
 
-// Helper function to get available booking times
+// Helper function to format time
 function formatDateTime(dateTime) {
     return moment.utc(dateTime).local().format('h:mma');
 }
 
-export default class StartMeeting extends React.Component {
+export default class EndMeeting extends React.Component {
 
     constructor(props) {
         super(props);
 
         this.state = {
             events: [],
-            next:[],
-            now:[],
             bookUntil:[],
             times:[],
             show: false,
-            email: '',
-            subject: '',
             selectedButton: null,
             room_name: ""
         };
@@ -77,43 +72,15 @@ export default class StartMeeting extends React.Component {
 
     handleSubmit(event) {
 
-        //Call the Graph command to create a new booking from now
-
-        //Validate form inputs
-
-        //Get start date (now)
-
-        //Send to Graph
-
-        //Return confirm message (sweetalert)
-
+        //Set the data to update
         const apiData = {
-            subject: this.state.subject,
-            body: {
-                contentType: "HTML",
-                content: "AMR Booked meeting"
-            },
-            start: {
-                dateTime: moment(this.props.time, "H:mma").format(),
-                timeZone: "GMT Standard Time"
-            },
             end: {
-                dateTime: moment(this.state.selectedButton).format(),
+                dateTime: moment().format(),
                 timeZone: "GMT Standard Time"
-            },
-            location: {
-                displayName: this.getRoomName(this.props.match.params.room)
-            },
-            attendees: [{
-                emailAddress: {
-                    address: "rossm@aspin.co.uk",
-                    name: "Ross Murray"
-                },
-                type: "required"
-            }]
-        }
+            }
+        };
 
-
+        //Get the access token to send to the service
         var accessToken =  window.msal.acquireTokenSilent({
             scopes: config.scopes
         });
@@ -124,17 +91,17 @@ export default class StartMeeting extends React.Component {
         Promise.resolve(accessToken)
             .then((res) => {
                 //Post event
-                var result =  createEvent(res.accessToken,  apiData, this.props.match.params.room );
+                var result =  updateEvent(res.accessToken,  apiData, this.props.match.params.room, this.props.match.params.id );
 
                 Promise.resolve(result)
                     .then((res2) => {
 
                         //Check for success
-                        if(res2.status === 201) {
+                        if(res2.status === 200) {
                             //Redirect to calendar page
                             this.props.history.push('/calendar/' + this.props.match.params.room);
                         }
-                //Check iff reseult was successful and return to
+                        //Check iff reseult was successful and return to
                     });
 
             });
@@ -176,35 +143,14 @@ export default class StartMeeting extends React.Component {
 
                     <form onSubmit={this.handleSubmit}>
                         <fieldset>
-                        <Row className="section book-until">
-                            <Col xs={12}><h6>Select Meeting End Time</h6></Col>
-                            <Col>
+                            <Row className="text-center section book-until">
+                                <Col xs={12}><h3>Are you sure you want to end the current meeting?</h3></Col>
+                            </Row>
 
-                                {this.state.times.map((hours, i) => {
-
-                                    var row = hours.map((time, key) =>
-                                        <Col xs={3} key={key}>
-                                            <Button key={key} className={time === this.state.selectedButton ? 'selected' : ''} variant="secondary" size="lg" key={time} onClick={this.buttonSelected(time)}>{formatDateTime(time)}</Button>
-                                        </Col>
-                                    );
-                                    return <Row key={i}>{row}</Row>;
-                                })}
-                            </Col>
-
-                        </Row>
-                        <Row className="section booker">
-                            <Col xs={12}><h6>Your Aspin Email</h6></Col>
-                            <Col xs={12}><input className="form-control form-control-lg" type="text" name="email" value={this.state.email} onChange={this.handleChange} /></Col>
-                        </Row>
-
-                        <Row className="section subject">
-                            <Col xs={12}><h6>Meeting Subject</h6></Col>
-                            <Col xs={12}><input className="form-control form-control-lg" type="text" name="subject" value={this.state.subject} onChange={this.handleChange} /></Col>
-                        </Row>
 
                         </fieldset>
 
-                        <input type="submit" className="col-12 btn btn-lg btn-success" value="Start Meeting" />
+                        <input type="submit" className="col-12 btn btn-lg btn-error" value="End Meeting" />
                     </form>
                 </Container>
             </div>

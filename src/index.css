@@ -107,6 +107,12 @@ button.btn-secondary.selected {
     border-color: #264653;
 }
 
+.container .btn-primary:visited {
+    color: #fff;
+    background-color: #264653;
+    border-color: #264653;
+}
+
 .container .btn-primary:hover {
     color: #fff;
     background-color: #1D353F;
@@ -119,13 +125,15 @@ button.btn-secondary.selected {
     border-color: #1D353F;
 }
 
-.container .btn-primary:visited {
-    color: #fff;
-    background-color: #1D353F;
-    border-color: #1D353F;
-}
+
 
 .container .btn-success {
+    color: #fff;
+    background-color: #238276;
+    border-color: #238276;
+}
+
+.container .btn-success:visited {
     color: #fff;
     background-color: #238276;
     border-color: #238276;
@@ -143,11 +151,7 @@ button.btn-secondary.selected {
     border-color: #1B665D;
 }
 
-.container .btn-success:visited {
-    color: #fff;
-    background-color: #1B665D;
-    border-color: #1B665D;
-}
+
 
 .container .btn-error {
     color: #fff;
@@ -155,11 +159,48 @@ button.btn-secondary.selected {
     border-color: #E76F51;
 }
 
+.container .btn-error:visited {
+    color: #fff;
+    background-color: #E76F51;
+    border-color: #E76F51;
+}
+
+.container .btn-error:hover {
+    color: #fff;
+    background-color: #BB5137;
+    border-color: #BB5137;
+}
+
+.container .btn-error:active {
+    color: #fff;
+    background-color: #BB5137;
+    border-color: #BB5137;
+}
+
 .container .btn-warning {
     color: #fff;
     background-color: #F4A261;
     border-color: #F4A261;
 }
+
+.container .btn-warning:visited {
+    color: #fff;
+    background-color: #F4A261;
+    border-color: #F4A261;
+}
+
+.container .btn-warning:hover {
+    color: #fff;
+    background-color: #F4A261;
+    border-color: #F4A261;
+}
+
+.container .btn-warning:active {
+    color: #fff;
+    background-color: #F4A261;
+    border-color: #F4A261;
+}
+
 
 .today-table {
     height:410px;

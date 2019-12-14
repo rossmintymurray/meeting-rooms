@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
-import ReactDOM from "react-dom"
-import {BrowserRouter as Router, Link, Route} from 'react-router-dom';
-import {Col, Container, Row} from 'reactstrap';
+import { BrowserRouter as Router, Link, Route } from 'react-router-dom';
+import { Col, Container, Row } from 'reactstrap';
 import ErrorMessage from './ErrorMessage';
 import Welcome from './Welcome';
 import 'bootstrap/dist/css/bootstrap.css';
 import config from './Config';
 import { UserAgentApplication } from 'msal';
-import {getEvents, getNextEvent, getNowEvent, getUserDetails} from './GraphService';
+import { getUserDetails } from './GraphService';
 import Calendar from './Calendar';
 import StartMeeting from './StartMeeting';
+import ExtendMeeting from './ExtendMeeting';
+import EndMeeting from './EndMeeting';
 import Unsplash from 'react-unsplash-wrapper'
 import moment from "moment";
 
@@ -137,6 +138,22 @@ class App extends Component {
                                              user={this.state.user}
                                              time={this.state.time}
                                              showError={this.setErrorMessage.bind(this)} />
+                               } />
+                        <Route exact path="/calendar/:id/extend-meeting"
+                               render={(props) =>
+                                   <ExtendMeeting {...props}
+                                                  isAuthenticated={this.state.isAuthenticated}
+                                                  user={this.state.user}
+                                                  time={this.state.time}
+                                                  showError={this.setErrorMessage.bind(this)} />
+                               } />
+                        <Route exact path="/calendar/:id/end-meeting"
+                               render={(props) =>
+                                   <EndMeeting {...props}
+                                               isAuthenticated={this.state.isAuthenticated}
+                                               user={this.state.user}
+                                               time={this.state.time}
+                                               showError={this.setErrorMessage.bind(this)} />
                                } />
                     </Container>
                 </div>

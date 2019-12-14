@@ -117,7 +117,8 @@ export default class Calendar extends React.Component {
     render() {
 
         const nowLength = this.state.now.length;
-        const link = "/calendar/" + this.props.match.params.room + "/start-meeting";
+        const startMeetingLink = "/calendar/" + this.props.match.params.room + "/start-meeting";
+
         return (
             <div>
                 <Container>
@@ -132,8 +133,9 @@ export default class Calendar extends React.Component {
                         {nowLength > 0 ? (
 
                             this.state.now.map((event, i) => {
+                                const extendMeetingLink = "/calendar/" + event.id + "/extend-meeting";
+                                const endMeetingLink = "/calendar/" + event.id + "/end-meeting";
                                     //Check start date is before now and end date is after now
-
                                     if(moment().isBetween(moment(event.start.dateTime), moment(event.end.dateTime))){
 
                                         return(
@@ -144,8 +146,16 @@ export default class Calendar extends React.Component {
 
                                                 </Col>
                                                 <Col xs="8"><h4><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h4></Col>
-                                                <Col xs="2"><Button className="col-12" variant="success" size="sm">Extend </Button></Col>
-                                                <Col xs="2"><Button className="col-12" variant="error" size="sm">End</Button></Col>
+                                                <Col xs="2">
+                                                    <Link to={extendMeetingLink}>
+                                                        <Button className="col-12" variant="success" size="sm">Extend </Button>
+                                                    </Link>
+                                                </Col>
+                                                <Col xs="2">
+                                                    <Link to={endMeetingLink}>
+                                                        <Button className="col-12" variant="error" size="sm">End</Button>
+                                                    </Link>
+                                                </Col>
 
 
 
@@ -158,7 +168,7 @@ export default class Calendar extends React.Component {
                                             <>
                                                 <Col xs="8"><h2>Room Available</h2></Col>
                                                 <Col xs="4" className="text-right">
-                                                    <Link to={link}>
+                                                    <Link to={startMeetingLink}>
                                                         <Button variant="success" size="lg">Start Meeting</Button>
                                                     </Link>
 
@@ -176,7 +186,7 @@ export default class Calendar extends React.Component {
                             <>
                                 <Col xs="8"><h2>Room Available</h2></Col>
                                 <Col xs="4" className="text-right">
-                                <Link to={link}>
+                                <Link to={startMeetingLink}>
                                     <Button variant="success" size="lg">Start Meeting</Button>
                                 </Link>
 
@@ -308,12 +318,12 @@ export default class Calendar extends React.Component {
 
                         </Col>
                         <Col xs="4">
-                            <Link to={link}>
+                            <Link to={startMeetingLink}>
                                 <Button className="col-12" variant="primary" size="lg">Book</Button>
                             </Link>
                         </Col>
                         <Col xs="4">
-                            <Link to={link}>
+                            <Link to={startMeetingLink}>
                                 <Button className="col-12" variant="primary" size="lg">Find a room</Button>
                             </Link>
                         </Col>

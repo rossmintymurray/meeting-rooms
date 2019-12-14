@@ -1,4 +1,5 @@
 import axios from 'axios';
+import moment from "moment";
 var graph = require('@microsoft/microsoft-graph-client');
 
 
@@ -88,7 +89,38 @@ export async function getBookUntilOptions(accessToken, now, room) {
         .top(1)
         .get();
 
-    return events;
+    //Set up times array
+    let times = [];
+
+    //Get the next available 15 minute interval
+    const roundedUp = Math.ceil(moment().minute() / 15) * 15;
+    let bookTime = moment().minute(roundedUp).second(0);
+
+    //Only show book times between these
+    const beforeTime = moment('08:30', "HH:mm");
+    const afterTime = moment('13:45', "HH:mm").add(1, "minute");
+
+    //Iterate over the 15 minute interval until booking time reaches next booking
+    while(moment(bookTime).isBefore(moment(events.value[0].start.dateTime))) {
+
+        //Get the hour of the book time (so we can start each hour on new line)
+        let hour = moment(bookTime).format("HH");
+        if (bookTime.isBetween(beforeTime, afterTime)) {
+            //Check if hour array exists
+            if(hour in times) {
+                //Set following hours
+                times[hour].push(bookTime);
+            } else {
+                //Set first hour
+                times[hour] = [bookTime];
+            }
+        }
+
+        //Increment the book time by 15 minutes
+        bookTime = (moment(bookTime).add(15, 'minutes'));
+    }
+
+    return times;
 }
 
 export async function createEvent(accessToken, apiData, room) {
@@ -104,6 +136,27 @@ export async function createEvent(accessToken, apiData, room) {
 
     //Post data to api
     await axios.post('https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)), apiData,config)
+        .then(res => {
+            result = res;
+        });
+
+    return result;
+
+}
+
+export async function updateEvent(accessToken, apiData, room, id) {
+
+    let result = [];
+    //Set up headers and access token
+    let config = {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: 'Bearer ' + accessToken
+        }
+    };
+
+    //Post data to api
+    await axios.patch('https://graph.microsoft.com/v1.0'  + (getAPIPath(room)) + '/' + id, apiData,config)
         .then(res => {
             result = res;
         });
