@@ -7,6 +7,8 @@ import { createEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
+import { FormControl } from 'react-bootstrap';
+import { InputGroup } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import {Link} from "react-router-dom";
 
@@ -106,8 +108,8 @@ export default class StartMeeting extends React.Component {
             },
             attendees: [{
                 emailAddress: {
-                    address: "rossm@aspin.co.uk",
-                    name: "Ross Murray"
+                    address: this.state.email + "@aspin.co.uk",
+                    name: ""
                 },
                 type: "required"
             }]
@@ -193,8 +195,24 @@ export default class StartMeeting extends React.Component {
 
                         </Row>
                         <Row className="section booker">
+
                             <Col xs={12}><h6>Your Aspin Email</h6></Col>
-                            <Col xs={12}><input className="form-control form-control-lg" type="text" name="email" value={this.state.email} onChange={this.handleChange} /></Col>
+                            <Col xs={12}>
+                                <InputGroup className="mb-3">
+                                    <FormControl
+                                        className="form-control-lg"
+                                        aria-label="Recipient's username"
+                                        aria-describedby="basic-addon2"
+                                        type="text"
+                                        name="email"
+                                        value={this.state.email}
+                                        onChange={this.handleChange}
+                                    />
+                                    <InputGroup.Append>
+                                        <InputGroup.Text id="basic-addon2">@aspin.co.uk</InputGroup.Text>
+                                    </InputGroup.Append>
+                                </InputGroup>
+                            </Col>
                         </Row>
 
                         <Row className="section subject">
