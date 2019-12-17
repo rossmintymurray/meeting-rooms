@@ -11,6 +11,8 @@ import { FormControl } from 'react-bootstrap';
 import { InputGroup } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import {Link} from "react-router-dom";
+import { GiCalendar } from "react-icons/gi";
+import { ICON_NAME } from "react-icons/gi";
 
 // Helper function to get available booking times
 function formatDateTime(dateTime) {
@@ -224,6 +226,15 @@ export default class StartMeeting extends React.Component {
 
                         <input type="submit" className="col-12 btn btn-lg btn-success" value="Start Meeting" />
                     </form>
+                </Container>
+                <Container>
+                    <Row className="section action">
+                        <Col xs="12">
+                            <Link to="/calendar/{this.state.room_name}">
+                                <Button className="col-12" variant="primary" size="lg">Back</Button>
+                            </Link>
+                        </Col>
+                    </Row>
                 </Container>
             </div>
         );

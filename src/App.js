@@ -11,6 +11,7 @@ import Calendar from './Calendar';
 import StartMeeting from './StartMeeting';
 import ExtendMeeting from './ExtendMeeting';
 import EndMeeting from './EndMeeting';
+import FindRoom from './FindRoom';
 import Unsplash from 'react-unsplash-wrapper'
 import moment from "moment";
 
@@ -50,7 +51,8 @@ class App extends Component {
             user: {},
             error: null,
             imageUrl: null,
-            time: getTime()
+            time: getTime(),
+            backgroundImage: ""
         };
 
         //Get user details from Graph
@@ -74,7 +76,7 @@ class App extends Component {
         }
 
         this.intervalID = setInterval(
-            () => this.tick(),
+            () => this.refreshBackground(),
             1000
         );
 
@@ -92,6 +94,14 @@ class App extends Component {
         });
     }
 
+    //Refresh background picture
+    refreshBackground() {
+        this.setState({
+            backgroundImage: this.state.backgroundImage + "1"
+        });
+    }
+
+
     //Build the page
     render() {
         let error = null;
@@ -99,15 +109,19 @@ class App extends Component {
             error = <ErrorMessage message={this.state.error.message} debug={this.state.error.debug} />;
         }
 
-        const { imageUrl } = this.state;
+        const { imageUrl } = this.state.backgroundImage;
 
         return (
 
-
             <Router>
-                <div className="bg-image">
-                    <Unsplash width="768" height="1024" keywords="scenic, mountain, mountains, landscape, nature"/>
+                <div className="bg-image" style={{ backgroundImage: '' }}>
+                    <Unsplash
+                        width="768"
+                        height="1024"
+                        keywords="scenic, mountain, mountains, landscape, nature"
+                    />
                 </div>
+
                 <div>
                     <Container>
                         <Row className="header d-flex align-items-end" >
@@ -139,7 +153,7 @@ class App extends Component {
                                              time={this.state.time}
                                              showError={this.setErrorMessage.bind(this)} />
                                } />
-                        <Route exact path="/calendar/:id/extend-meeting"
+                        <Route exact path="/calendar/:room/:id/extend-meeting"
                                render={(props) =>
                                    <ExtendMeeting {...props}
                                                   isAuthenticated={this.state.isAuthenticated}
@@ -147,9 +161,17 @@ class App extends Component {
                                                   time={this.state.time}
                                                   showError={this.setErrorMessage.bind(this)} />
                                } />
-                        <Route exact path="/calendar/:id/end-meeting"
+                        <Route exact path="/calendar/:room/:id/end-meeting"
                                render={(props) =>
                                    <EndMeeting {...props}
+                                               isAuthenticated={this.state.isAuthenticated}
+                                               user={this.state.user}
+                                               time={this.state.time}
+                                               showError={this.setErrorMessage.bind(this)} />
+                               } />
+                        <Route exact path="/calendar/:room/find-room"
+                               render={(props) =>
+                                   <FindRoom {...props}
                                                isAuthenticated={this.state.isAuthenticated}
                                                user={this.state.user}
                                                time={this.state.time}

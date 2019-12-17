@@ -1,5 +1,6 @@
 import axios from 'axios';
 import moment from "moment";
+import {forEach} from "react-bootstrap/cjs/ElementChildren";
 var graph = require('@microsoft/microsoft-graph-client');
 
 
@@ -68,7 +69,7 @@ export async function getNowEvent(accessToken, now, room) {
 
 export async function getNextEvent(accessToken, now, room) {
     const client = getAuthenticatedClient(accessToken);
-
+console.log(now);
     const events = await client
         .api(getAPIPath(room))
         .filter("start/dateTime ge '" +  now +"'")
@@ -98,7 +99,7 @@ export async function getBookUntilOptions(accessToken, now, room) {
 
     //Only show book times between these
     const beforeTime = moment('08:30', "HH:mm");
-    const afterTime = moment('13:45', "HH:mm").add(1, "minute");
+    const afterTime = moment('23:45', "HH:mm").add(1, "minute");
 
     //Iterate over the 15 minute interval until booking time reaches next booking
     while(moment(bookTime).isBefore(moment(events.value[0].start.dateTime))) {
@@ -165,3 +166,24 @@ export async function updateEvent(accessToken, apiData, room, id) {
 
 }
 
+export async function getFreeRooms(accessToken, now, rooms) {
+    const client = getAuthenticatedClient(accessToken);
+    const events = [];
+    rooms.forEach(function(room, events) {
+            console.log(room);
+
+           events = client
+                .api(getAPIPath(room))
+                .filter("start/dateTime ge '" + now + "'")
+                .orderby('start/dateTime ASC')
+                .top(1)
+                .get();
+           console.log(events);
+        }
+
+
+    );
+
+
+    return events;
+}

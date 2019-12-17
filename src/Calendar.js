@@ -10,6 +10,8 @@ import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
 import { Button } from 'react-bootstrap';
 import {Link} from "react-router-dom";
+import { GiRoundTable } from "react-icons/gi";
+import { GiLookAt } from "react-icons/gi";
 
 // Helper function to format Graph date/time
 function formatDateTime(dateTime) {
@@ -118,7 +120,8 @@ export default class Calendar extends React.Component {
 
         const nowLength = this.state.now.length;
         const startMeetingLink = "/calendar/" + this.props.match.params.room + "/start-meeting";
-
+        const findRoomLink = "/calendar/" + this.props.match.params.room + "/find-room";
+        const bookRoomLink = "/calendar/" + this.props.match.params.room + "/book-room";
         return (
             <div>
                 <Container>
@@ -133,8 +136,8 @@ export default class Calendar extends React.Component {
                         {nowLength > 0 ? (
 
                             this.state.now.map((event, i) => {
-                                const extendMeetingLink = "/calendar/" + event.id + "/extend-meeting";
-                                const endMeetingLink = "/calendar/" + event.id + "/end-meeting";
+                                const extendMeetingLink = "/calendar/" + this.props.match.params.room + "/" + event.id + "/extend-meeting";
+                                const endMeetingLink = "/calendar/" + this.props.match.params.room + "/" + event.id + "/end-meeting";
                                     //Check start date is before now and end date is after now
                                     if(moment().isBetween(moment(event.start.dateTime), moment(event.end.dateTime))){
 
@@ -231,8 +234,6 @@ export default class Calendar extends React.Component {
                     </Row>
                 </Container>
 
-
-
                 <Container>
                     <Row className="section today">
                         <Col xs={12}><h6>Today</h6></Col>
@@ -271,59 +272,10 @@ export default class Calendar extends React.Component {
                     </Row>
                 </Container>
 
-                {/*<Container>*/}
-                {/*    <Row className="section tomorrow">*/}
-                {/*        <Col xs={12}><h6>Tomorrow</h6></Col>*/}
-                {/*    </Row>*/}
-                {/*    <Row>*/}
-                {/*        <Col>*/}
-                {/*            <Table>*/}
-                {/*                <thead>*/}
-                {/*                <tr>*/}
-                {/*                    <th scope="col">Organiser</th>*/}
-                {/*                    <th scope="col">Subject</th>*/}
-                {/*                    <th scope="col">Start</th>*/}
-                {/*                    <th scope="col">End</th>*/}
-                {/*                </tr>*/}
-                {/*                </thead>*/}
-                {/*                <tbody>*/}
-                {/*                {this.state.events.map(*/}
-                {/*                    function(event){*/}
-
-                {/*                        var style = "";*/}
-                {/*                        if(moment(event.start.dateTime).isAfter(moment(now()).add(1, 'day').startOf('day'))) {*/}
-
-                {/*                            return (*/}
-                {/*                                <tr className={style} key={event.id}>*/}
-                {/*                                    <td>{event.organizer.emailAddress.name}</td>*/}
-                {/*                                    <td>{event.subject}</td>*/}
-                {/*                                    <td>{formatDateTime(event.start.dateTime)}</td>*/}
-                {/*                                    <td>{formatDateTime(event.end.dateTime)}</td>*/}
-                {/*                                </tr>*/}
-                {/*                            );*/}
-                {/*                        }*/}
-                {/*                    })}*/}
-                {/*                </tbody>*/}
-                {/*            </Table>*/}
-                {/*        </Col>*/}
-                {/*    </Row>*/}
-                {/*</Container>*/}
-
                 <Container>
                     <Row className="section action">
-                        <Col xs="4">
-                            <Link to="/">
-                                <Button className="col-12" variant="primary" size="lg">Back</Button>
-                            </Link>
-
-                        </Col>
-                        <Col xs="4">
-                            <Link to={startMeetingLink}>
-                                <Button className="col-12" variant="primary" size="lg">Book</Button>
-                            </Link>
-                        </Col>
-                        <Col xs="4">
-                            <Link to={startMeetingLink}>
+                        <Col xs="12">
+                            <Link to={findRoomLink}>
                                 <Button className="col-12" variant="primary" size="lg">Find a room</Button>
                             </Link>
                         </Col>
