@@ -9,10 +9,6 @@ import { Col } from 'reactstrap';
 import { Button } from 'react-bootstrap';
 import {Link} from "react-router-dom";
 
-// Helper function to format Graph date/time
-function formatDateTime(dateTime) {
-    return moment.utc(dateTime).local().format('h:mma');
-}
 
 export default class FindRoom extends React.Component {
 
