@@ -33,10 +33,6 @@ function WelcomeContent(props) {
     return <Button color="primary" onClick={props.authButtonMethod}>Click here to sign in</Button>;
 }
 
-function getTodaysDate() {
-    return moment.utc().local().format('dddd, Do MMMM YYYY');
-}
-
 function getTime() {
     return moment.utc().local().format(' h:mma');
 }

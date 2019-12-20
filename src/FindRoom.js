@@ -1,6 +1,5 @@
 import React from 'react';
-import { Table } from 'reactstrap';
-import moment, {now} from 'moment';
+import moment from 'moment';
 import config from './Config';
 import { getFreeRooms } from './GraphService';
 

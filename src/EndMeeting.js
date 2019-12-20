@@ -7,12 +7,6 @@ import { updateEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
-import { Button } from 'react-bootstrap';
-
-// Helper function to format time
-function formatDateTime(dateTime) {
-    return moment.utc(dateTime).local().format('h:mma');
-}
 
 export default class EndMeeting extends React.Component {
 

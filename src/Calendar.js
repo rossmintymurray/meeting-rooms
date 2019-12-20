@@ -10,8 +10,6 @@ import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
 import { Button } from 'react-bootstrap';
 import {Link} from "react-router-dom";
-import { GiRoundTable } from "react-icons/gi";
-import { GiLookAt } from "react-icons/gi";
 
 // Helper function to format Graph date/time
 function formatDateTime(dateTime) {
@@ -121,7 +119,6 @@ export default class Calendar extends React.Component {
         const nowLength = this.state.now.length;
         const startMeetingLink = "/calendar/" + this.props.match.params.room + "/start-meeting";
         const findRoomLink = "/calendar/" + this.props.match.params.room + "/find-room";
-        const bookRoomLink = "/calendar/" + this.props.match.params.room + "/book-room";
         return (
             <div>
                 <Container>
@@ -222,7 +219,14 @@ export default class Calendar extends React.Component {
                                             <Col xs={12}><h6><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h6></Col>
                                         </>
                                     )
+                                } else {
+                                    return(
+                                        <>
+                                            <Col xs="8"><h4>No meetings</h4></Col>
+                                        </>
+                                    )
                                 }
+
 
                             })
                         }

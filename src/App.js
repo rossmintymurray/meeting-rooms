@@ -65,15 +65,15 @@ class App extends Component {
     //On mount (load)
     async componentDidMount() {
 
-        try {
-            // Get the user's access token
-            var accessToken = await window.msal.acquireTokenSilent({
-                scopes: config.scopes
-            });
-        }
-        catch(err) {
-            alert("there has been a problem loading the user")
-        }
+        // try {
+        //     // Get the user's access token
+        //     var accessToken = await window.msal.acquireTokenSilent({
+        //         scopes: config.scopes
+        //     });
+        // }
+        // catch(err) {
+        //     alert("there has been a problem loading the user")
+        // }
 
         this.intervalID = setInterval(
             () => this.refreshBackground(),
@@ -109,12 +109,12 @@ class App extends Component {
             error = <ErrorMessage message={this.state.error.message} debug={this.state.error.debug} />;
         }
 
-        const { imageUrl } = this.state.backgroundImage;
+        const  imageUrl = this.state.backgroundImage;
 
         return (
 
             <Router>
-                <div className="bg-image" style={{ backgroundImage: '' }}>
+                <div className="bg-image" style={{ backgroundImage: imageUrl }}>
                     <Unsplash
                         width="768"
                         height="1024"

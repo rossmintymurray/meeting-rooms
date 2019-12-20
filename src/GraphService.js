@@ -1,6 +1,5 @@
 import axios from 'axios';
 import moment from "moment";
-import {forEach} from "react-bootstrap/cjs/ElementChildren";
 var graph = require('@microsoft/microsoft-graph-client');
 
 

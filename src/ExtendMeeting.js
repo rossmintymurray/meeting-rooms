@@ -152,7 +152,7 @@ export default class ExtendMeeting extends React.Component {
 
                                         var row = hours.map((time, key) =>
                                             <Col xs={3} key={key}>
-                                                <Button key={key} className={time === this.state.selectedButton ? 'selected' : ''} variant="secondary" size="lg" key={time} onClick={this.buttonSelected(time)}>{formatDateTime(time)}</Button>
+                                                <Button key2={key} className={time === this.state.selectedButton ? 'selected' : ''} variant="secondary" size="lg" key={time} onClick={this.buttonSelected(time)}>{formatDateTime(time)}</Button>
                                             </Col>
                                         );
                                         return <Row key={i}>{row}</Row>;
