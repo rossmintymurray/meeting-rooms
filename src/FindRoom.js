@@ -69,7 +69,7 @@ export default class FindRoom extends React.Component {
 
         const nowLength = this.state.freeRooms.length;
         const startMeetingLink = "/calendar/" + this.props.match.params.room + "/start-meeting/";
-
+        const backLink = "/calendar/" + this.props.match.params.room ;
         return (
             <div>
                 <Container>
@@ -112,7 +112,7 @@ export default class FindRoom extends React.Component {
                 <Container>
                     <Row className="section action">
                         <Col xs="12">
-                            <Link to="/calendar/{this.state.room_name}">
+                            <Link to={backLink}>
                                 <Button className="col-12" variant="primary" size="lg">Back</Button>
                             </Link>
                         </Col>

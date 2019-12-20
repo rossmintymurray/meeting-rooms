@@ -169,6 +169,8 @@ export default class StartMeeting extends React.Component {
 
     render() {
 
+        const backLink = "/calendar/" + this.props.match.params.room ;
+
         return (
             <div>
                 <Container>
@@ -201,7 +203,7 @@ export default class StartMeeting extends React.Component {
                             <Col xs={12}><h6>Your Aspin Email</h6></Col>
                             <Col xs={12}>
                                 <InputGroup className="mb-3">
-                                    <FormControl
+                                     <FormControl
                                         className="form-control-lg"
                                         aria-label="Recipient's username"
                                         aria-describedby="basic-addon2"
@@ -230,7 +232,7 @@ export default class StartMeeting extends React.Component {
                 <Container>
                     <Row className="section action">
                         <Col xs="12">
-                            <Link to="/calendar/{this.state.room_name}">
+                            <Link to={ backLink }>
                                 <Button className="col-12" variant="primary" size="lg">Back</Button>
                             </Link>
                         </Col>
