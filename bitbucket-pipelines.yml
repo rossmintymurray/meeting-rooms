@@ -27,6 +27,6 @@ pipelines:
           - tar -xf packaged/package-${BITBUCKET_BUILD_NUMBER}.tar.gz -C upload
           - apk update && apk add openssh rsync
           - rsync -a  -e "ssh -o StrictHostKeyChecking=no" --delete upload/ $USERNAME@$SERVER:/var/www/tmp/react-${BITBUCKET_BUILD_NUMBER}
-          - ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "rm -r /var/www"
-          - ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "mv '/var/www/tmp/react-${BITBUCKET_BUILD_NUMBER}' '/var/www'"
-          - ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "chmod -R u+rwX,go+rX,go-w /var/www"
+          - ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "rm -r /var/www/aspin-meeting-rooms"
+          - ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "mv '/var/www/tmp/react-${BITBUCKET_BUILD_NUMBER}' '/var/www/aspin-meeting-rooms'"
+          - ssh -o StrictHostKeyChecking=no $USERNAME@$SERVER "chmod -R u+rwX,go+rX,go-w /var/www/aspin-meeting-rooms"
