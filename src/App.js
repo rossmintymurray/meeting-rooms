@@ -99,6 +99,7 @@ class App extends Component {
         this.setState({
             backgroundImage: this.state.backgroundImage + "1"
         });
+        this.tick();
     }
 
 
