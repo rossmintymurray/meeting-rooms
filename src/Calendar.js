@@ -15,6 +15,9 @@ import {Link} from "react-router-dom";
 function formatDateTime(dateTime) {
     return moment.utc(dateTime).local().format('h:mma');
 }
+function getDay(dateTime) {
+    return moment.utc(dateTime).local().format('dddd Do MMMM');
+}
 
 export default class Calendar extends React.Component {
 
@@ -212,13 +215,37 @@ export default class Calendar extends React.Component {
                                 var now = moment();
 
                                 if(now.isBefore(startTime)){
-                                    return(
-                                        <>
-                                            <Col xs="8"><h4>{event.subject}</h4></Col>
-                                            <Col xs="4" className="text-right"><h6>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h6></Col>
-                                            <Col xs={12}><h6><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h6></Col>
-                                        </>
-                                    )
+                                    if(moment(event.start.dateTime).isSame(moment(), 'day')) {
+                                        return (
+                                            <>
+                                                <Col xs="8"><h4>{event.subject}</h4></Col>
+
+                                                {/*If start date is not today*/}
+
+                                                <Col xs="4" className="text-right">
+                                                    <h6>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h6>
+                                                </Col>
+                                                <Col xs={12}><h6><span
+                                                    className="light">Booked by</span> {event.organizer.emailAddress.name}
+                                                </h6></Col>
+                                            </>
+                                        )
+                                    } else {
+                                        return (
+                                            <>
+                                                <Col xs="8"><h4>{event.subject}</h4></Col>
+
+                                                {/*If start date is not today*/}
+
+                                                <Col xs="4" className="text-right">
+                                                    <h6>{getDay(event.start.dateTime)}<br/>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h6>
+                                                </Col>
+                                                <Col xs={12}><h6><span
+                                                    className="light">Booked by</span> {event.organizer.emailAddress.name}
+                                                </h6></Col>
+                                            </>
+                                        )
+                                    }
                                 } else {
                                     return(
                                         <>
