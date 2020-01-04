@@ -47,6 +47,7 @@ export default class FindRoom extends React.Component {
                         freeRoomsArray.push(room);
                     }
                 });
+                return true;
             });
 
             this.setState({freeRooms: freeRoomsArray});
