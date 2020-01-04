@@ -106,6 +106,10 @@ button.btn-secondary.selected {
 
 }
 
+.bottom-spacer {
+    margin-bottom:30px;
+}
+
 .container .btn-primary {
     color: #fff;
     background-color: #264653;
