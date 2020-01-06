@@ -78,7 +78,12 @@ export default class Calendar extends React.Component {
         clearInterval(this.intervalID);
     }
 
-    updateViewport(accessToken) {
+    updateViewport() {
+        // Get the user's access token
+        var accessToken = window.msal.acquireTokenSilent({
+            scopes: config.scopes
+        });
+
         this.updateNow(accessToken);
         this.updateNext(accessToken);
         this.updateEvents(accessToken);
@@ -111,7 +116,7 @@ export default class Calendar extends React.Component {
         } else  if (room === "goldfish-bowl") {
             roomName = "Goldfish Bowl";
         } else {
-            return "Ross Murray";
+            return "Error - Unknown Room";
         }
 
         return roomName;

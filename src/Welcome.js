@@ -21,9 +21,6 @@ function WelcomeContent(props) {
                     <Col>
                         <Link className="btn btn-primary btn-lg" to="/calendar/goldfish-bowl">Goldfish Bowl</Link>
                     </Col>
-                    <Col>
-                        <Link className="btn btn-primary btn-lg" to="/calendar/ross-test">Ross Test</Link>
-                    </Col>
                 </Row>
             </div>
         );

@@ -16,7 +16,7 @@ export default class FindRoom extends React.Component {
         super(props);
 
         this.state = {
-            rooms: ["conference-room", "meeting-room", "goldfish-bowl", "me"],
+            rooms: ["conference-room", "meeting-room", "goldfish-bowl"],
             freeRooms: [],
             room_name: ""
 
@@ -67,7 +67,7 @@ export default class FindRoom extends React.Component {
         } else  if (room === "goldfish-bowl") {
             roomName = "Goldfish Bowl";
         } else {
-            return "Ross Murray";
+            return "Error - Unknown Room";
         }
 
         return roomName;
