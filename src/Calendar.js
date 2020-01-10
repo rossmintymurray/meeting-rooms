@@ -29,7 +29,7 @@ export default class Calendar extends React.Component {
             next:[],
             now:[],
             show: false,
-            room_name: ""
+            room_name: []
 
         };
     }
@@ -108,13 +108,16 @@ export default class Calendar extends React.Component {
 
 
     getRoomName(room) {
-        var roomName = "";
+        var roomName = [];
         if (room === "conference-room") {
-            roomName = "Conference Room";
+            roomName["display"] = "Conference Room";
+            roomName["organiser"] = "Board Room 3HFM";
         } else  if (room === "meeting-room") {
-            roomName = "Meeting Room";
+            roomName["display"] = "Meeting Room";
+            roomName["organiser"] = "Meeting Room 3HFM";
         } else  if (room === "goldfish-bowl") {
-            roomName = "Goldfish Bowl";
+            roomName["display"] = "Goldfish Bowl";
+            roomName["organiser"] = "Goldfish Bowl";
         } else {
             return "Error - Unknown Room";
         }
@@ -131,7 +134,7 @@ export default class Calendar extends React.Component {
             <div>
                 <Container>
                     <Row>
-                        <Col xs={12} className="text-center"><h1 className="room-name">{this.state.room_name}</h1></Col>
+                        <Col xs={12} className="text-center"><h1 className="room-name">{this.state.room_name.display}</h1></Col>
                     </Row>
                 </Container>
                 <Container>
@@ -143,6 +146,16 @@ export default class Calendar extends React.Component {
                             this.state.now.map((event, i) => {
                                 const extendMeetingLink = "/calendar/" + this.props.match.params.room + "/" + event.id + "/extend-meeting";
                                 const endMeetingLink = "/calendar/" + this.props.match.params.room + "/" + event.id + "/end-meeting";
+
+                                //Check if booked by the room, display 1st attendee if so.
+                                let nowBookerName = "";
+                                if(event.organizer.emailAddress.name === this.state.room_name.organiser) {
+                                    nowBookerName = event.attendees[0].emailAddress.name;;
+                                } else {
+                                    nowBookerName = event.organizer.emailAddress.name;
+                                }
+
+
                                     //Check start date is before now and end date is after now
                                     if(moment().isBetween(moment(event.start.dateTime), moment(event.end.dateTime))){
 
@@ -150,10 +163,10 @@ export default class Calendar extends React.Component {
                                             <>
                                                 <Col xs="8"><h2>{event.subject}</h2></Col>
                                                 <Col xs="4" className="text-right">
-                                                    <h5>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h5>
+                                                    <h4>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h4>
 
                                                 </Col>
-                                                <Col xs="8"><h4><span className="light">Booked by</span> {event.organizer.emailAddress.name}</h4></Col>
+                                                <Col xs="8"><h4><span className="light">Booked by</span> {nowBookerName}</h4></Col>
                                                 <Col xs="2">
                                                     <Link to={extendMeetingLink}>
                                                         <Button className="col-12" variant="success" size="sm">Extend </Button>
@@ -219,6 +232,14 @@ export default class Calendar extends React.Component {
                                 var startTime = moment(event.start.dateTime);
                                 var now = moment();
 
+                            //Check if booked by the room, display 1st attendee if so.
+                            let nextbookerName = "";
+                            if(event.organizer.emailAddress.name === this.state.room_name.organiser) {
+                                nextbookerName = event.attendees[0].emailAddress.name;
+                            } else {
+                                nextbookerName = event.organizer.emailAddress.name;
+                            }
+
                                 if(now.isBefore(startTime)){
                                     if(moment(event.start.dateTime).isSame(moment(), 'day')) {
                                         return (
@@ -228,10 +249,10 @@ export default class Calendar extends React.Component {
                                                 {/*If start date is not today*/}
 
                                                 <Col xs="4" className="text-right">
-                                                    <h6>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h6>
+                                                    <h4>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h4>
                                                 </Col>
                                                 <Col xs={12}><h6><span
-                                                    className="light">Booked by</span> {event.organizer.emailAddress.name}
+                                                    className="light">Booked by</span> {nextbookerName}
                                                 </h6></Col>
                                             </>
                                         )
@@ -243,10 +264,11 @@ export default class Calendar extends React.Component {
                                                 {/*If start date is not today*/}
 
                                                 <Col xs="4" className="text-right">
-                                                    <h6>{getDay(event.start.dateTime)}<br/>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h6>
+                                                    <h6 className="small next-event-alt-day-date">{getDay(event.start.dateTime)}</h6>
+                                                    <h5>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h5>
                                                 </Col>
                                                 <Col xs={12}><h6><span
-                                                    className="light">Booked by</span> {event.organizer.emailAddress.name}
+                                                    className="light">Booked by</span> {nextbookerName}
                                                 </h6></Col>
                                             </>
                                         )
@@ -286,16 +308,23 @@ export default class Calendar extends React.Component {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {this.state.events.map(
-                                    function(event){
+                                {this.state.events.map((event, i) => {
 
                                         var style = "";
                                         if(moment(event.end.dateTime).isBefore(moment(now()))) {
                                             style = "expired";
                                         }
+
+                                        //Check if booked by the room, display 1st attendee if so.
+                                        let bookerName = "";
+                                        if(event.organizer.emailAddress.name === this.state.room_name.organiser) {
+                                            bookerName = event.attendees[0].emailAddress.name;;
+                                        } else {
+                                            bookerName = event.organizer.emailAddress.name;
+                                        }
                                         return(
                                             <tr className={style} key={event.id}>
-                                                <td>{event.organizer.emailAddress.name}</td>
+                                                <td>{bookerName}</td>
                                                 <td>{event.subject}</td>
                                                 <td>{formatDateTime(event.start.dateTime)}</td>
                                                 <td>{formatDateTime(event.end.dateTime)}</td>
