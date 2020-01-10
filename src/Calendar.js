@@ -149,7 +149,7 @@ export default class Calendar extends React.Component {
 
                                 //Check if booked by the room, display 1st attendee if so.
                                 let nowBookerName = "";
-                                if(event.organizer.emailAddress.name === this.state.room_name.organiser) {
+                                if(event.organizer.emailAddress.name === this.state.room_name.organiser && event.attendees.length > 0) {
                                     nowBookerName = event.attendees[0].emailAddress.name;;
                                 } else {
                                     nowBookerName = event.organizer.emailAddress.name;
@@ -234,7 +234,7 @@ export default class Calendar extends React.Component {
 
                                 //Check if booked by the room, display 1st attendee if so.
                                 let nextbookerName = "";
-                                if(event.organizer.emailAddress.name === this.state.room_name.organiser) {
+                                if(event.organizer.emailAddress.name === this.state.room_name.organiser && event.attendees.length > 0) {
                                     nextbookerName = event.attendees[0].emailAddress.name;
                                 } else {
                                     nextbookerName = event.organizer.emailAddress.name;
@@ -317,7 +317,7 @@ export default class Calendar extends React.Component {
 
                                         //Check if booked by the room, display 1st attendee if so.
                                         let bookerName = "";
-                                        if(event.organizer.emailAddress.name === this.state.room_name.organiser) {
+                                        if(event.organizer.emailAddress.name === this.state.room_name.organiser && event.attendees.length > 0) {
                                             bookerName = event.attendees[0].emailAddress.name;;
                                         } else {
                                             bookerName = event.organizer.emailAddress.name;
