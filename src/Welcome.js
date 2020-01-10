@@ -13,7 +13,7 @@ function WelcomeContent(props) {
             <div>
                 <Row className="text-center">
                     <Col>
-                        <Link className="btn btn-primary btn-lg" to="/calendar/conference-room">Conference Room</Link>
+                        <Link className="btn btn-primary btn-lg" to="/calendar/board-room">Board Room</Link>
                     </Col>
                     <Col>
                         <Link className="btn btn-primary btn-lg" to="/calendar/meeting-room">Meeting Room</Link>

@@ -109,8 +109,8 @@ export default class Calendar extends React.Component {
 
     getRoomName(room) {
         var roomName = [];
-        if (room === "conference-room") {
-            roomName["display"] = "Conference Room";
+        if (room === "board-room") {
+            roomName["display"] = "Board Room";
             roomName["organiser"] = "Board Room 3HFM";
         } else  if (room === "meeting-room") {
             roomName["display"] = "Meeting Room";
@@ -232,13 +232,13 @@ export default class Calendar extends React.Component {
                                 var startTime = moment(event.start.dateTime);
                                 var now = moment();
 
-                            //Check if booked by the room, display 1st attendee if so.
-                            let nextbookerName = "";
-                            if(event.organizer.emailAddress.name === this.state.room_name.organiser) {
-                                nextbookerName = event.attendees[0].emailAddress.name;
-                            } else {
-                                nextbookerName = event.organizer.emailAddress.name;
-                            }
+                                //Check if booked by the room, display 1st attendee if so.
+                                let nextbookerName = "";
+                                if(event.organizer.emailAddress.name === this.state.room_name.organiser) {
+                                    nextbookerName = event.attendees[0].emailAddress.name;
+                                } else {
+                                    nextbookerName = event.organizer.emailAddress.name;
+                                }
 
                                 if(now.isBefore(startTime)){
                                     if(moment(event.start.dateTime).isSame(moment(), 'day')) {

@@ -19,7 +19,7 @@ function getAuthenticatedClient(accessToken) {
 function getAPIPath(room) {
     var email = "";
     //Get email address flr selected room
-    if (room === "conference-room") {
+    if (room === "board-room") {
         email = "newconfroom3@aspin4.onmicrosoft.com";
     } else  if (room === "meeting-room") {
         email = "oldconfroom3@aspin4.onmicrosoft.com";
