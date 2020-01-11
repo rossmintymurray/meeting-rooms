@@ -9,6 +9,8 @@ import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
 import { css } from "@emotion/core";
 import BarLoader from "react-spinners/BarLoader";
+import {Link} from "react-router-dom";
+import {Button} from "react-bootstrap";
 
 //Set up the loader spinners
 const override = css`
@@ -179,6 +181,15 @@ export default class EndMeeting extends React.Component {
 
                         <input type="submit" className="col-12 btn btn-lg btn-error" value="End Meeting" />
                     </form>
+                </Container>
+                <Container>
+                    <Row className="section action">
+                        <Col xs="12">
+                            <Link to="/calendar/{this.state.room_name}">
+                                <Button className="col-12" variant="primary" size="lg">Back</Button>
+                            </Link>
+                        </Col>
+                    </Row>
                 </Container>
             </div>
         );
