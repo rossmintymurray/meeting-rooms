@@ -100,7 +100,7 @@ button.btn-secondary.selected {
 }
 
 .action {
-    position:fixed;
+    position:absolute;
     bottom:40px;
     width:690px;
 
