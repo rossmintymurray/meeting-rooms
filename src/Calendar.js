@@ -2,9 +2,7 @@ import React from 'react';
 import { Table } from 'reactstrap';
 import moment, {now} from 'moment';
 import config from './Config';
-import { getEvents } from './GraphService';
-import { getNextEvent } from './GraphService';
-import { getNowEvent } from './GraphService';
+import {getDaysEvents, updateDaysEvents} from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
@@ -55,28 +53,22 @@ export default class Calendar extends React.Component {
             var accessToken = await window.msal.acquireTokenSilent({
                 scopes: config.scopes
             });
-            // Get the user's events (table)
-            var events = await getEvents(accessToken, moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss'), moment().endOf('day').add(1, 'minutes').format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
+
+            //Get Calendar view data
+            var events = await getDaysEvents(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
+
             // Update the array of events in state
-            this.setState({events: events.value});
-
-            // Now event
-            var now = await getNowEvent(accessToken,  moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
-            // Update the array of events in state
-            this.setState({now: now.value});
-
-            //Next event
-            var next = await getNextEvent(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
-            // Update the array of events in state
-            this.setState({next: next.value});
-
-
+            this.setState({events: events[0].value});
+            this.setState({now: events[1]});
+            this.setState({next: events[2]});
 
             //Set the update interval of events
             this.intervalID = setInterval(
-                () => this.updateViewport(accessToken),
-                10000
+                () => this.updateViewport(),
+                5000
             );
+
+            //Update loading stated to hide loader image
             this.setState({loading: false});
 
         }
@@ -89,34 +81,24 @@ export default class Calendar extends React.Component {
         clearInterval(this.intervalID);
     }
 
+    //Call to update all calendar screen information
     updateViewport() {
         // Get the user's access token
         var accessToken = window.msal.acquireTokenSilent({
             scopes: config.scopes
         });
 
-        this.updateNow(accessToken);
-        this.updateNext(accessToken);
-        this.updateEvents(accessToken);
-    }
-    updateNow(accessToken) {
-        getNowEvent(accessToken,  moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room).then(result => this.setState({
-            now: result.value
-        }))
-    }
+        //Get Calendar view data
+        var events = updateDaysEvents(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
 
-    updateNext(accessToken) {
-        getNextEvent(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room).then(result => this.setState({
-            next: result.value
-        }))
-    }
+        Promise.resolve(events).then((res2) => {
+            // Update the array of events in state
+            this.setState({events: res2[0].value});
+            this.setState({now: res2[1]});
+            this.setState({next: res2[2]});
+        });
 
-    updateEvents(accessToken) {
-        getEvents(accessToken, moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss'), moment().endOf('day').format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room).then(result => this.setState({
-            events: result.value
-        }))
     }
-
 
     getRoomName(room) {
         var roomName = [];
@@ -141,7 +123,7 @@ export default class Calendar extends React.Component {
         const nowLength = this.state.now.length;
         const startMeetingLink = "/calendar/" + this.props.match.params.room + "/start-meeting";
         const findRoomLink = "/calendar/" + this.props.match.params.room + "/find-room";
-        const  loading  = this.state.loading;
+        const loading  = this.state.loading;
 
         return (
             loading ?  <div>

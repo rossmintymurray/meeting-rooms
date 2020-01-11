@@ -29,7 +29,7 @@ function getAPIPath(room) {
         return "/me/events";
     }
 
-    return "/users/" + email + "/events";
+    return "/users/" + email + "/";
 
 }
 
@@ -40,50 +40,102 @@ export async function getUserDetails(accessToken) {
     return user;
 }
 
+//Get all events for the day and place in an array
+export async function getDaysEvents(accessToken, now, room) {
 
-export async function getEvents(accessToken, dayStart, dayEnd, room) {
+    //Get the client
     const client = getAuthenticatedClient(accessToken);
 
-    const events = await client
-        .api(getAPIPath(room))
-        .filter("start/dateTime ge '" +  dayStart +"'and end/dateTime le '"+ dayEnd +"'")
-        .orderby('start/dateTime ASC')
+    //Set up current day start and end vars
+    const start = moment(now).startOf("day").toISOString();
+    const end = moment(now).endOf("day").toISOString();
+
+    //Get all events for the day
+    const daysEvents = await client
+        .api(getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+        .orderby('start/DateTime ASC')
         .get();
-    return events;
+
+    //Get the now event
+    const nowEvent = getNowEvent(daysEvents.value, now);
+
+    //Get the next event
+    const nextEvent = getNextEvent(daysEvents.value, now);
+
+    return [
+        daysEvents,
+        nowEvent,
+        nextEvent
+    ];
+
 }
 
-export async function getNowEvent(accessToken, now, room) {
+//Get all events for the day and place in an array -- Called asyncronously
+export async function updateDaysEvents(accessToken, now, room) {
 
+    //Get the client
     const client = getAuthenticatedClient(accessToken);
 
-    const events = await client
-        .api(getAPIPath(room))
-        .filter("start/dateTime le '" +  now +"' and end/dateTime ge '"+ now +"'")
-        .orderby('start/dateTime ASC')
-        .top(1)
+    //Set up current day start and end vars
+    const start = moment(now).startOf("day").toISOString();
+    const end = moment(now).endOf("day").toISOString();
+
+    //Get all events for the day
+    const daysEvents = await client
+        .api(getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+        .orderby('start/DateTime ASC')
         .get();
 
-    return events;
+    //Get the now event
+    const nowEvent = getNowEvent(daysEvents.value, now);
+
+    //Get the next event
+    const nextEvent = getNextEvent(daysEvents.value, now);
+
+    return [
+        daysEvents,
+        nowEvent,
+        nextEvent
+    ];
 }
 
-export async function getNextEvent(accessToken, now, room) {
-    const client = getAuthenticatedClient(accessToken);
+function getNowEvent(daysEvents, now) {
 
-    const events = await client
-        .api(getAPIPath(room))
-        .filter("start/dateTime ge '" +  now +"'")
-        .orderby('start/dateTime ASC')
-        .top(1)
-        .get();
+    var nowEvent =  daysEvents.filter(function(event) {
+        return moment(event.start.dateTime).isSameOrBefore(moment(now)) &&  moment(event.end.dateTime).isSameOrAfter(moment(now))
+    });
 
-    return events;
+    //Iterate over daysEvents checking if there is one now
+    //  daysEvents.map((event, key) => {
+    //      if (moment(event.start.dateTime).isSameOrBefore(moment(now)) &&  moment(event.end.dateTime).isSameOrAfter(moment(now))) {
+    //          nowEvent = event;
+    //      }
+    //  });
+
+    return nowEvent;
+}
+
+function getNextEvent(daysEvents, now, ) {
+
+    let nextEvent = [];
+    //Iterate over daysEvents finding the next one
+    daysEvents.map((event, key) => {
+        if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
+            nextEvent.push(event);
+        }
+    });
+
+    //Remove all but the first item in the array
+    nextEvent.splice(1, nextEvent.length);
+
+    return nextEvent;
 }
 
 export async function getBookUntilOptions(accessToken, now, room) {
     const client = getAuthenticatedClient(accessToken);
 
     const events = await client
-        .api(getAPIPath(room))
+        .api(getAPIPath(room) + "events")
         .filter("start/dateTime ge '" +  now +"'")
         .orderby('start/dateTime ASC')
         .top(1)
