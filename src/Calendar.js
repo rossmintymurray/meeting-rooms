@@ -9,7 +9,7 @@ import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
 import { Button } from 'react-bootstrap';
-import {BrowserRouter as Link} from "react-router-dom";
+import  {Link} from "react-router-dom";
 import { css } from "@emotion/core";
 import BarLoader from "react-spinners/BarLoader";
 
