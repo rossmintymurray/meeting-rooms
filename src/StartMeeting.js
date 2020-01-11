@@ -11,6 +11,15 @@ import { FormControl } from 'react-bootstrap';
 import { InputGroup } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 import {Link} from "react-router-dom";
+import { css } from "@emotion/core";
+import BarLoader from "react-spinners/BarLoader";
+
+//Set up the loader spinners
+const override = css`
+  display: block;
+  margin: 200px auto 0 auto;
+  border-color: #238276;
+`;
 
 // Helper function to get available booking times
 function formatDateTime(dateTime) {
@@ -32,7 +41,8 @@ export default class StartMeeting extends React.Component {
             email: '',
             subject: '',
             selectedButton: null,
-            room_name: ""
+            room_name: "",
+            loading: true
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -57,6 +67,7 @@ export default class StartMeeting extends React.Component {
 
             // Update the array of events in state
             this.setState({times: bookUntil});
+            this.setState({loading: false});
         }
 
         catch(err) {
@@ -79,6 +90,8 @@ export default class StartMeeting extends React.Component {
 
     handleSubmit(event) {
 
+        //Show loading
+        this.setState({loading: true});
         //Call the Graph command to create a new booking from now
 
         //Validate form inputs
@@ -168,8 +181,25 @@ export default class StartMeeting extends React.Component {
     render() {
 
         const backLink = "/calendar/" + this.props.match.params.room ;
-
+        const  loading  = this.state.loading;
         return (
+            loading ?  <div>
+                    <Container>
+                        <Row>
+                            <Col xs={12}>
+                                <BarLoader
+                                    css={override}
+                                    size={150}
+                                    //size={"150px"} this also works
+                                    color={"#238276"}
+                                    loading={this.state.loading}
+                                />
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
+                :
+
             <div>
                 <Container>
                     <Row>

@@ -8,7 +8,15 @@ import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
 import { Button } from 'react-bootstrap';
 import {Link} from "react-router-dom";
+import { css } from "@emotion/core";
+import BarLoader from "react-spinners/BarLoader";
 
+//Set up the loader spinners
+const override = css`
+  display: block;
+  margin: 200px auto 0 auto;
+  border-color: #238276;
+`;
 
 export default class FindRoom extends React.Component {
 
@@ -18,7 +26,8 @@ export default class FindRoom extends React.Component {
         this.state = {
             rooms: ["board-room", "meeting-room", "goldfish-bowl"],
             freeRooms: [],
-            room_name: ""
+            room_name: "",
+            loading: true
 
         };
     }
@@ -45,7 +54,9 @@ export default class FindRoom extends React.Component {
                     if(res2.value.length === 0) {
                         //this.props.history.push('/calendar/' + this.props.match.params.room);
                         freeRoomsArray.push(room);
+
                     }
+                    this.setState({loading: false});
                 });
                 return true;
             });
@@ -75,7 +86,25 @@ export default class FindRoom extends React.Component {
 
     render() {
         const backLink = "/calendar/" + this.props.match.params.room ;
+        const  loading  = this.state.loading;
+
         return (
+            loading ?  <div>
+                    <Container>
+                        <Row>
+                            <Col xs={12}>
+                                <BarLoader
+                                    css={override}
+                                    size={150}
+                                    //size={"150px"} this also works
+                                    color={"#238276"}
+                                    loading={this.state.loading}
+                                />
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
+                :
             <div>
                 <Container>
                     <Row>

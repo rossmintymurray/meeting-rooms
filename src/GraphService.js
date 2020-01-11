@@ -98,7 +98,7 @@ export async function getBookUntilOptions(accessToken, now, room) {
 
     //Only show book times between these
     const beforeTime = moment('08:30', "HH:mm");
-    const afterTime = moment('17:30', "HH:mm").add(1, "minute");
+    const afterTime = moment('23:30', "HH:mm").add(1, "minute");
 
     //Iterate over the 15 minute interval until booking time reaches next booking
     while(moment(bookTime).isBefore(moment(events.value[0].start.dateTime).add(1, 'minute'))) {

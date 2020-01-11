@@ -7,6 +7,15 @@ import { updateEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
+import { css } from "@emotion/core";
+import BarLoader from "react-spinners/BarLoader";
+
+//Set up the loader spinners
+const override = css`
+  display: block;
+  margin: 200px auto 0 auto;
+  border-color: #238276;
+`;
 
 export default class EndMeeting extends React.Component {
 
@@ -19,7 +28,8 @@ export default class EndMeeting extends React.Component {
             times:[],
             show: false,
             selectedButton: null,
-            room_name: ""
+            room_name: "",
+            loading: true
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -44,6 +54,8 @@ export default class EndMeeting extends React.Component {
 
             // Update the array of events in state
             this.setState({times: bookUntil});
+
+            this.setState({loading: false});
         }
 
         catch(err) {
@@ -65,6 +77,9 @@ export default class EndMeeting extends React.Component {
     }
 
     handleSubmit(event) {
+
+        //Show loading div
+        this.setState({loading: true});
 
         //Set the data to update
         const apiData = {
@@ -126,7 +141,25 @@ export default class EndMeeting extends React.Component {
 
     render() {
 
+        const  loading  = this.state.loading;
+
         return (
+            loading ?  <div>
+                    <Container>
+                        <Row>
+                            <Col xs={12}>
+                                <BarLoader
+                                    css={override}
+                                    size={150}
+                                    //size={"150px"} this also works
+                                    color={"#238276"}
+                                    loading={this.state.loading}
+                                />
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
+                :
             <div>
                 <Container>
                     <Row>
