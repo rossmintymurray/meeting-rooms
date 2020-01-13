@@ -32,9 +32,12 @@ tr.expired {
 }
 
 .section {
-    margin-top:30px;
+    margin-top:50px;
 }
 
+.section.now {
+    margin-top:10px;
+}
 .section h6, .section h5, .light {
     font-weight:300;
 }

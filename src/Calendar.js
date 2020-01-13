@@ -174,8 +174,8 @@ export default class Calendar extends React.Component {
 
                                                 return (
                                                     <>
-                                                        <Col xs="8"><h2>{event.subject}</h2></Col>
-                                                        <Col xs="4" className="text-right">
+                                                        <Col xs="7"><h2>{event.subject}</h2></Col>
+                                                        <Col xs="5" className="text-right">
                                                             <h4>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h4>
 
                                                         </Col>
