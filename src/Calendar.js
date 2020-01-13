@@ -2,7 +2,7 @@ import React from 'react';
 import { Table } from 'reactstrap';
 import moment, {now} from 'moment';
 import config from './Config';
-import {getDaysEvents, updateDaysEvents} from './GraphService';
+import {getAPIAccessToken, getDaysEvents} from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
@@ -50,9 +50,7 @@ export default class Calendar extends React.Component {
             this.setState({room_name: room_name});
 
             // Get the user's access token
-            var accessToken = await window.msal.acquireTokenSilent({
-                scopes: config.scopes
-            });
+            var accessToken = await getAPIAccessToken();
 
             //Get Calendar view data
             var events = await getDaysEvents(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
@@ -82,14 +80,13 @@ export default class Calendar extends React.Component {
     }
 
     //Call to update all calendar screen information
-    updateViewport() {
+    async updateViewport() {
         // Get the user's access token
-        var accessToken = window.msal.acquireTokenSilent({
-            scopes: config.scopes
-        });
+        var accessToken = await getAPIAccessToken();
 
+        console.log(accessToken);
         //Get Calendar view data
-        var events = updateDaysEvents(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
+        var events = getDaysEvents(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
 
         Promise.resolve(events).then((res2) => {
             // Update the array of events in state

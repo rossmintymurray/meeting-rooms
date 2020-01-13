@@ -1,7 +1,38 @@
 import axios from 'axios';
 import moment from "moment";
+import config from './Config';
 var graph = require('@microsoft/microsoft-graph-client');
+const qs = require('qs');
 
+export async function getAPIAccessToken() {
+    const APP_ID = config.appId;
+    const APP_SECRET = config.appSecret;
+    const TOKEN_ENDPOINT ='https://login.microsoftonline.com/' + config.tenantId + '/oauth2/v2.0/token';
+    const MS_GRAPH_SCOPE = 'https://graph.microsoft.com/.default';
+
+    const postData = {
+        grant_type:'client_credentials',
+        client_id: APP_ID,
+        scope: MS_GRAPH_SCOPE,
+        client_secret: APP_SECRET,
+    };
+
+    let result = "";
+
+    axios.defaults.headers.post['Content-Type'] =
+        'application/x-www-form-urlencoded';
+
+    await axios.post(TOKEN_ENDPOINT, qs.stringify(postData))
+        .then(response => {
+            result = response.data["access_token"];
+        })
+        .catch(error => {
+            console.log(error);
+    });
+
+    return result;
+
+}
 
 function getAuthenticatedClient(accessToken) {
     // Initialize Graph client
@@ -33,70 +64,44 @@ function getAPIPath(room) {
 
 }
 
-export async function getUserDetails(accessToken) {
-    const client = getAuthenticatedClient(accessToken);
-
-    const user = await client.api('/me').get();
-    return user;
-}
-
 //Get all events for the day and place in an array
 export async function getDaysEvents(accessToken, now, room) {
 
-    //Get the client
-    const client = getAuthenticatedClient(accessToken);
-
     //Set up current day start and end vars
     const start = moment(now).startOf("day").toISOString();
     const end = moment(now).endOf("day").toISOString();
 
+    let daysEvents = [];
+
+    //Set up headers and access token
+    axios.defaults.headers.get['Authorization'] =
+        'Bearer ' + accessToken;
+
+    //Post data to api
+    await axios.get('https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+        .then(res => {
+            daysEvents = res;
+        });
+
     //Get all events for the day
-    const daysEvents = await client
-        .api(getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
-        .orderby('start/DateTime ASC')
-        .get();
+    // const daysEvents = await client
+    //     .api(getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+    //     .orderby('start/DateTime ASC')
+    //     .get();
+
 
     //Get the now event
-    const nowEvent = getNowEvent(daysEvents.value, now);
-
+    const nowEvent = await getNowEvent(daysEvents.data.value, now);
+    console.log(nowEvent);
     //Get the next event
-    const nextEvent = getNextEvent(daysEvents.value, now);
+    const nextEvent = await getNextEvent(accessToken, daysEvents.value, now, room);
 
     return [
-        daysEvents,
+        daysEvents.data,
         nowEvent,
         nextEvent
     ];
 
-}
-
-//Get all events for the day and place in an array -- Called asyncronously
-export async function updateDaysEvents(accessToken, now, room) {
-
-    //Get the client
-    const client = getAuthenticatedClient(accessToken);
-
-    //Set up current day start and end vars
-    const start = moment(now).startOf("day").toISOString();
-    const end = moment(now).endOf("day").toISOString();
-
-    //Get all events for the day
-    const daysEvents = await client
-        .api(getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
-        .orderby('start/DateTime ASC')
-        .get();
-
-    //Get the now event
-    const nowEvent = getNowEvent(daysEvents.value, now);
-
-    //Get the next event
-    const nextEvent = getNextEvent(daysEvents.value, now);
-
-    return [
-        daysEvents,
-        nowEvent,
-        nextEvent
-    ];
 }
 
 function getNowEvent(daysEvents, now) {
@@ -115,19 +120,55 @@ function getNowEvent(daysEvents, now) {
     return nowEvent;
 }
 
-function getNextEvent(daysEvents, now, ) {
+async function getNextEvent(accessToken, daysEvents, now, room) {
+    console.log(daysEvents);
 
-    let nextEvent = [];
-    //Iterate over daysEvents finding the next one
-    daysEvents.map((event, key) => {
-        if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
-            nextEvent.push(event);
-        }
-    });
+    let events = [];
+    let nextEvents = [];
 
+    //Check if any daysEvents exist
+    if(!daysEvents) {
+        //Get events up to a week in advance
+        //Set up current day start and end vars
+        const start = moment(now).toISOString();
+        const end = moment(now).add("1", "week").toISOString();
+
+        //Set up headers and access token
+        axios.defaults.headers.get['Authorization'] =
+            'Bearer ' + accessToken;
+
+        //Post data to api
+        await axios.get('https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+            .then(res => {
+                events = res.data.value;
+
+                //Iterate over daysEvents finding the next one
+                events.map((event, key) => {
+                    if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
+                        nextEvents.push(event);
+                    }
+                });
+
+                let nextEvent = [];
+                nextEvent.push(nextEvents[0]);
+                console.log(nextEvent);
+                return nextEvent;
+
+            });
+    } else {
+        //Next event is today
+        events = daysEvents;
+
+        //Iterate over daysEvents finding the next one
+        events.map((event, key) => {
+            if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
+                nextEvents.push(event);
+            }
+        });
+    }
     //Remove all but the first item in the array
-    nextEvent.splice(1, nextEvent.length);
-
+    let nextEvent = [];
+    nextEvent.push(nextEvents[0]);
     return nextEvent;
 }
 
@@ -208,7 +249,7 @@ export async function updateEvent(accessToken, apiData, room, id) {
     };
 
     //Post data to api
-    await axios.patch('https://graph.microsoft.com/v1.0'  + (getAPIPath(room)) + '/' + id, apiData,config)
+    await axios.patch('https://graph.microsoft.com/v1.0'  + (getAPIPath(room)) + 'events/' + id, apiData,config)
         .then(res => {
             result = res;
         });
@@ -221,12 +262,21 @@ export async function getFreeRooms(accessToken, now, room) {
 
     const client = getAuthenticatedClient(accessToken);
 
-        var roomEvent = client
-            .api(getAPIPath(room))
-            .filter("start/dateTime le '" +  now +"' and end/dateTime ge '"+ now +"'")
-            .orderby('start/dateTime ASC')
-            .top(1)
-            .get();
+    //Set up current day start and end vars
+    const start = moment(now).startOf("day").toISOString();
+    const end = moment(now).endOf("day").toISOString();
 
-    return roomEvent;
+    //Get all events for the day
+    const daysEvents = await client
+        .api(getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+        .orderby('start/DateTime ASC')
+        .get();
+
+    if(daysEvents.length > 0) {
+        var roomEvent = daysEvents.filter(function (event) {
+            return moment(event.start.dateTime).isSameOrBefore(moment(now)) && moment(event.end.dateTime).isSameOrAfter(moment(now))
+        });
+    }
+
+    return daysEvents;
 }

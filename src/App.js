@@ -6,7 +6,7 @@ import Welcome from './Welcome';
 import 'bootstrap/dist/css/bootstrap.css';
 import config from './Config';
 import { UserAgentApplication } from 'msal';
-import { getUserDetails } from './GraphService';
+import  {getAPIAccessToken}  from './GraphService';
 import Calendar from './Calendar';
 import StartMeeting from './StartMeeting';
 import ExtendMeeting from './ExtendMeeting';
@@ -31,35 +31,20 @@ class App extends Component {
     constructor(props) {
         super(props);
 
-        //MS gRaph to get user
-        this.userAgentApplication = new UserAgentApplication({
-            auth: {
-                clientId: config.appId
-            },
-            cache: {
-                cacheLocation: "localStorage",
-                storeAuthStateInCookie: true
-            }
-        });
-
-        //Set the user
-        var user = this.userAgentApplication.getAccount();
+        //Get access token with API key
+        const accessToken = getAPIAccessToken();
 
         //Set up states
         this.state = {
-            isAuthenticated: (user !== null),
+            isAuthenticated: true,
+            accessToken: accessToken,
             user: {},
             error: null,
             imageUrl: null,
             time: getTime(),
-            backgroundImage: ""
+            backgroundImage: "",
         };
 
-        //Get user details from Graph
-        if (user) {
-            // Enhance user object with data from Graph
-            this.getUserProfile();
-        }
     }
 
     //On mount (load)
@@ -136,8 +121,7 @@ class App extends Component {
                                render={(props) =>
                                    <Welcome {...props}
                                             isAuthenticated={this.state.isAuthenticated}
-                                            user={this.state.user}
-                                            authButtonMethod={this.login.bind(this)} />
+                                            user={this.state.user} />
                                } />
                         <Route exact path="/calendar/:room"
                                render={(props) =>
@@ -190,87 +174,6 @@ class App extends Component {
         });
     }
 
-    async login() {
-        try {
-            await this.userAgentApplication.loginPopup(
-                {
-                    scopes: config.scopes,
-                    prompt: "select_account"
-                });
-            await this.getUserProfile();
-        }
-        catch(err) {
-            var error = {};
-
-            if (typeof(err) === 'string') {
-                var errParts = err.split('|');
-                error = errParts.length > 1 ?
-                    { message: errParts[1], debug: errParts[0] } :
-                    { message: err };
-            } else {
-                error = {
-                    message: err.message,
-                    debug: JSON.stringify(err)
-                };
-            }
-
-            this.setState({
-                isAuthenticated: false,
-                user: {},
-                error: error
-            });
-        }
-    }
-
-    logout() {
-        this.userAgentApplication.logout();
-    }
-
-    async getUserProfile() {
-        try {
-            // Get the access token silently
-            // If the cache contains a non-expired token, this function
-            // will just return the cached token. Otherwise, it will
-            // make a request to the Azure OAuth endpoint to get a token
-
-            var accessToken = await this.userAgentApplication.acquireTokenSilent({
-                scopes: config.scopes
-            });
-
-            if (accessToken) {
-                // Get the user's profile from Graph
-                var user = await getUserDetails(accessToken);
-                this.setState({
-                    isAuthenticated: true,
-                    user: {
-                        displayName: user.displayName,
-                        email: user.mail || user.userPrincipalName
-                    },
-                    error: null
-                });
-            }
-        }
-        catch(err) {
-            var error = {};
-            if (typeof(err) === 'string') {
-                var errParts = err.split('|');
-                error = errParts.length > 1 ?
-                    { message: errParts[1], debug: errParts[0] } :
-                    { message: err };
-            } else {
-                error = {
-                    message: err.message,
-                    debug: JSON.stringify(err)
-                };
-            }
-
-            this.setState({
-                isAuthenticated: false,
-                user: {},
-                error: error
-            });
-        }
-    }
 }
 
 export default App;

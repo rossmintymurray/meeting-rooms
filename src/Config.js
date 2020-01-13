@@ -3,6 +3,10 @@ module.exports = {
     scopes: [
         "user.read",
         "calendars.read"
-    ]
+    ],
+    tenantId: '21eb728f-8ae1-46a4-a3d3-9dcb36f554fa',
+    appSecret: '44uYCqz:Hy1EjnT/XvLO?RJ/mWBQcpr1'
+
+
 };
 

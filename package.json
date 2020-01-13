@@ -28,6 +28,7 @@
   },
   "scripts": {
     "start": "HTTPS=true react-scripts start",
+    "prestart": "cp -f server.pem ./node_modules/webpack-dev-server/ssl",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

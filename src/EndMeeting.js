@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import config from './Config';
 
-import { getBookUntilOptions } from './GraphService';
+import { getAPIAccessToken } from './GraphService';
 import { updateEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
@@ -46,17 +46,6 @@ export default class EndMeeting extends React.Component {
             // Update the array of events in state
             this.setState({room_name: room_name});
 
-            // Get the user's access token
-            var accessToken = await window.msal.acquireTokenSilent({
-                scopes: config.scopes
-            });
-
-            // Get the book until options (times that the room is bookable until in 15 min increments)
-            var bookUntil = await getBookUntilOptions(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room );
-
-            // Update the array of events in state
-            this.setState({times: bookUntil});
-
             this.setState({loading: false});
         }
 
@@ -78,10 +67,15 @@ export default class EndMeeting extends React.Component {
         });
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
 
         //Show loading div
         this.setState({loading: true});
+
+        event.preventDefault();
+
+        // Get the user's access token
+        var accessToken = await getAPIAccessToken();
 
         //Set the data to update
         const apiData = {
@@ -91,31 +85,21 @@ export default class EndMeeting extends React.Component {
             }
         };
 
-        //Get the access token to send to the service
-        var accessToken =  window.msal.acquireTokenSilent({
-            scopes: config.scopes
-        });
+        console.log(accessToken);
+        var result = updateEvent(accessToken,  apiData, this.props.match.params.room, this.props.match.params.id );
 
-        event.preventDefault();
+            Promise.resolve(result)
+                .then((res2) => {
 
-        //Resolve access token promise so we can send the accessToken value to MS Graph
-        Promise.resolve(accessToken)
-            .then((res) => {
-                //Post event
-                var result =  updateEvent(res.accessToken,  apiData, this.props.match.params.room, this.props.match.params.id );
+                    //Check for success
+                    if(res2.status === 200) {
+                        //Redirect to calendar page
+                        this.props.history.push('/calendar/' + this.props.match.params.room);
+                    }
+                    //Check iff reseult was successful and return to
+                });
 
-                Promise.resolve(result)
-                    .then((res2) => {
 
-                        //Check for success
-                        if(res2.status === 200) {
-                            //Redirect to calendar page
-                            this.props.history.push('/calendar/' + this.props.match.params.room);
-                        }
-                        //Check iff reseult was successful and return to
-                    });
-
-            });
 
 
         //alert('A name was submitted: ' + this.props.time  + " - " + this.state.subject +" - " + this.state.email + " - " + moment(this.state.selectedButton).format("HH:mm"));
