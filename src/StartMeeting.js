@@ -1,8 +1,7 @@
 import React from 'react';
 import moment from 'moment';
-import config from './Config';
 
-import { getBookUntilOptions } from './GraphService';
+import {getAPIAccessToken, getBookUntilOptions} from './GraphService';
 import { createEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
@@ -49,7 +48,7 @@ export default class StartMeeting extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    async componentDidMount() {
+     async componentDidMount() {
 
         try {
             //Get room name
@@ -58,16 +57,18 @@ export default class StartMeeting extends React.Component {
             this.setState({room_name: room_name});
 
             // Get the user's access token
-            var accessToken = await window.msal.acquireTokenSilent({
-                scopes: config.scopes
-            });
+            var accessToken = await getAPIAccessToken();
 
             // Get the book until options (times that the room is bookable until in 15 min increments)
             var bookUntil = await getBookUntilOptions(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room );
 
-            // Update the array of events in state
-            this.setState({times: bookUntil});
-            this.setState({loading: false});
+            Promise.resolve(bookUntil).then((res2) => {
+                console.log(res2);
+                // Update the array of events in state
+                this.setState({times: res2});
+                this.setState({loading: false});
+            });
+
         }
 
         catch(err) {
@@ -88,7 +89,7 @@ export default class StartMeeting extends React.Component {
         });
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
 
         //Show loading
         this.setState({loading: true});
@@ -129,34 +130,18 @@ export default class StartMeeting extends React.Component {
         }
 
 
-        var accessToken =  window.msal.acquireTokenSilent({
-            scopes: config.scopes
-        });
-
+        // Get the user's access token
+        var accessToken = await getAPIAccessToken();
         event.preventDefault();
 
         //Resolve access token promise so we can send the accessToken value to MS Graph
-        Promise.resolve(accessToken)
-            .then((res) => {
-                //Post event
-                var result =  createEvent(res.accessToken,  apiData, this.props.match.params.room );
+        var result =  await createEvent(accessToken,  apiData, this.props.match.params.room );
 
-                Promise.resolve(result)
-                    .then((res2) => {
-
-                        //Check for success
-                        if(res2.status === 201) {
-                            //Redirect to calendar page
-                            this.props.history.push('/calendar/' + this.props.match.params.room);
-                        }
-                //Check iff reseult was successful and return to
-                    });
-
-            });
-
-
-        //alert('A name was submitted: ' + this.props.time  + " - " + this.state.subject +" - " + this.state.email + " - " + moment(this.state.selectedButton).format("HH:mm"));
-        //Prevent the default submit
+        //Check for success
+        if(result.status === 201) {
+            //Redirect to calendar page
+            this.props.history.push('/calendar/' + this.props.match.params.room);
+        }
 
     }
 

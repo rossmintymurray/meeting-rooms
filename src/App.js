@@ -4,8 +4,6 @@ import { Col, Container, Row } from 'reactstrap';
 import ErrorMessage from './ErrorMessage';
 import Welcome from './Welcome';
 import 'bootstrap/dist/css/bootstrap.css';
-import config from './Config';
-import { UserAgentApplication } from 'msal';
 import  {getAPIAccessToken}  from './GraphService';
 import Calendar from './Calendar';
 import StartMeeting from './StartMeeting';

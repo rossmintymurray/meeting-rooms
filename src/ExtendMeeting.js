@@ -1,8 +1,7 @@
 import React from 'react';
 import moment from 'moment';
-import config from './Config';
 
-import { getBookUntilOptions } from './GraphService';
+import {getAPIAccessToken, getBookUntilOptions} from './GraphService';
 import { updateEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
@@ -47,17 +46,19 @@ export default class ExtendMeeting extends React.Component {
 
         try {
             //Get room name
-            var room_name = await this.getRoomName(this.props.match.params.room);
+            var room_name = this.getRoomName(this.props.match.params.room);
+
             // Update the array of events in state
             this.setState({room_name: room_name});
 
             // Get the user's access token
-            var accessToken = await window.msal.acquireTokenSilent({
-                scopes: config.scopes
-            });
+            var accessToken = await getAPIAccessToken();
+
 
             // Get the book until options (times that the room is bookable until in 15 min increments)
             var bookUntil = await getBookUntilOptions(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room );
+
+            console.log(bookUntil);
 
             // Update the array of events in state
             this.setState({times: bookUntil});
@@ -83,7 +84,7 @@ export default class ExtendMeeting extends React.Component {
         });
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
 
         //Show loading div
         this.setState({loading: true});
@@ -96,31 +97,28 @@ export default class ExtendMeeting extends React.Component {
             }
         };
 
-        //Get the access token to send to the service
-        var accessToken =  window.msal.acquireTokenSilent({
-            scopes: config.scopes
-        });
+        // Get the user's access token
+        var accessToken =  await getAPIAccessToken();
 
         event.preventDefault();
 
         //Resolve access token promise so we can send the accessToken value to MS Graph
-        Promise.resolve(accessToken)
-            .then((res) => {
                 //Post event
-                var result =  updateEvent(res.accessToken,  apiData, this.props.match.params.room, this.props.match.params.id );
+        var result =  updateEvent(accessToken,  apiData, this.props.match.params.room, this.props.match.params.id );
 
-                Promise.resolve(result)
-                    .then((res2) => {
 
-                        //Check for success
-                        if(res2.status === 200) {
-                            //Redirect to calendar page
-                            this.props.history.push('/calendar/' + this.props.match.params.room);
-                        }
-                        //Check iff reseult was successful and return to
-                    });
+        Promise.resolve(result)
+            .then((res2) => {
 
+                //Check for success
+                if(res2.status === 200) {
+                    //Redirect to calendar page
+                    this.props.history.push('/calendar/' + this.props.match.params.room);
+                }
+                //Check iff reseult was successful and return to
             });
+
+
 
 
         //alert('A name was submitted: ' + this.props.time  + " - " + this.state.subject +" - " + this.state.email + " - " + moment(this.state.selectedButton).format("HH:mm"));
@@ -147,7 +145,7 @@ export default class ExtendMeeting extends React.Component {
     }
 
     render() {
-
+        const backLink = "/calendar/" + this.props.match.params.room ;
         const  loading  = this.state.loading;
 
         return (
@@ -202,7 +200,7 @@ export default class ExtendMeeting extends React.Component {
                 <Container>
                     <Row className="section action">
                         <Col xs="12">
-                            <Link to="/calendar/{this.state.room_name}">
+                            <Link to={backLink}>
                                 <Button className="col-12" variant="primary" size="lg">Back</Button>
                             </Link>
                         </Col>

@@ -1,6 +1,5 @@
 import React from 'react';
 import moment from 'moment';
-import config from './Config';
 
 import { getAPIAccessToken } from './GraphService';
 import { updateEvent } from './GraphService';
@@ -126,7 +125,7 @@ export default class EndMeeting extends React.Component {
     }
 
     render() {
-
+        const backLink = "/calendar/" + this.props.match.params.room ;
         const  loading  = this.state.loading;
 
         return (
@@ -169,7 +168,7 @@ export default class EndMeeting extends React.Component {
                 <Container>
                     <Row className="section action">
                         <Col xs="12">
-                            <Link to="/calendar/{this.state.room_name}">
+                            <Link to={backLink}>
                                 <Button className="col-12" variant="primary" size="lg">Back</Button>
                             </Link>
                         </Col>

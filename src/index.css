@@ -32,6 +32,10 @@ tr.expired {
 }
 
 .section {
+    margin-top:30px;
+}
+
+.section.next, .section.today {
     margin-top:50px;
 }
 

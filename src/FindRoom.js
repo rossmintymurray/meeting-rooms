@@ -1,7 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import config from './Config';
-import { getFreeRooms } from './GraphService';
+import {getAPIAccessToken, getFreeRooms} from './GraphService';
 
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
@@ -28,7 +27,6 @@ export default class FindRoom extends React.Component {
             freeRooms: [],
             room_name: "",
             loading: true
-
         };
     }
 
@@ -36,32 +34,28 @@ export default class FindRoom extends React.Component {
         try {
 
             // Get the user's access token
-            var accessToken = await window.msal.acquireTokenSilent({
-                scopes: config.scopes
-            });
-
-            //Set up the free rooms array
-            let freeRoomsArray = [];
+            var accessToken = await getAPIAccessToken();
 
             //Iterate over the rooms
-            this.state.rooms.map((room, i) => {
+            await this.state.rooms.map((room, i) => {
                 // Get the user's events (table)
                 var freeRooms =  getFreeRooms(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), room);
 
                 //Resolve promise
                 Promise.resolve(freeRooms).then((res2) => {
                     //Check that the events are not now
-                    if(res2.value.length === 0) {
+                    if(res2.length === 0) {
                         //this.props.history.push('/calendar/' + this.props.match.params.room);
-                        freeRoomsArray.push(room);
-
+                        this.state.freeRooms.push(room);
                     }
-                    this.setState({loading: false});
+
+
                 });
-                return true;
+
+                return false;
             });
 
-            this.setState({freeRooms: freeRoomsArray});
+            this.setState({loading: false});
 
         }
         catch(err) {

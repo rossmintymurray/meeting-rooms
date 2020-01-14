@@ -1,7 +1,6 @@
 import axios from 'axios';
 import moment from "moment";
 import config from './Config';
-var graph = require('@microsoft/microsoft-graph-client');
 const qs = require('qs');
 
 export async function getAPIAccessToken() {
@@ -34,19 +33,6 @@ export async function getAPIAccessToken() {
 
 }
 
-function getAuthenticatedClient(accessToken) {
-    // Initialize Graph client
-    const client = graph.Client.init({
-        // Use the provided access token to authenticate
-        // requests
-        authProvider: (done) => {
-            done(null, accessToken.accessToken);
-        }
-    });
-
-    return client;
-}
-
 function getAPIPath(room) {
     var email = "";
     //Get email address flr selected room
@@ -68,7 +54,7 @@ function getAPIPath(room) {
 export async function getDaysEvents(accessToken, now, room) {
 
     //Set up current day start and end vars
-    const start = moment(now).startOf("day").toISOString();
+    const start = moment(now).startOf("day").add("1", "minute").toISOString();
     const end = moment(now).endOf("day").toISOString();
 
     let daysEvents = [];
@@ -147,6 +133,7 @@ async function getNextEvent(accessToken, daysEvents, now, room) {
                     if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
                         nextEvents.push(event);
                     }
+                    return false;
                 });
 
                 let nextEvent = [];
@@ -164,6 +151,7 @@ async function getNextEvent(accessToken, daysEvents, now, room) {
             if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
                 nextEvents.push(event);
             }
+            return false;
         });
     }
     //Remove all but the first item in the array
@@ -173,47 +161,71 @@ async function getNextEvent(accessToken, daysEvents, now, room) {
 }
 
 export async function getBookUntilOptions(accessToken, now, room) {
-    const client = getAuthenticatedClient(accessToken);
+    //Set up now start and end vars
+    const start = moment(now).toISOString();
+    const end = moment(now).endOf("day").toISOString();
 
-    const events = await client
-        .api(getAPIPath(room) + "events")
-        .filter("start/dateTime ge '" +  now +"'")
-        .orderby('start/dateTime ASC')
-        .top(1)
-        .get();
-
-    //Set up times array
+    console.log(accessToken);
+    let events = [];
     let times = [];
 
-    //Get the next available 15 minute interval
-    const roundedUp = Math.ceil(moment().minute() / 15) * 15;
-    let bookTime = moment().minute(roundedUp).second(0);
+    //Set up headers and access token
+    axios.defaults.headers.get['Authorization'] =
+        'Bearer ' + accessToken;
 
-    //Only show book times between these
-    const beforeTime = moment('08:30', "HH:mm");
-    const afterTime = moment('23:30', "HH:mm").add(1, "minute");
+    //Post data to api
+    await axios.get('https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+        .then(res => {
+            events = res.data;
 
-    //Iterate over the 15 minute interval until booking time reaches next booking
-    while(moment(bookTime).isBefore(moment(events.value[0].start.dateTime).add(1, 'minute'))) {
+            console.log(events);
 
-        //Get the hour of the book time (so we can start each hour on new line)
-        let hour = moment(bookTime).format("HH");
-        if (bookTime.isBetween(beforeTime, afterTime)) {
-            //Check if hour array exists
-            if(hour in times) {
-                //Set following hours
-                times[hour].push(bookTime);
+            //Get the next available 15 minute interval
+            const roundedUp = Math.ceil(moment().minute() / 15) * 15;
+            let bookTime = moment().minute(roundedUp).second(0);
+            let bookUntil = "";
+            //Only show book times between these
+            const beforeTime = moment('08:30', "HH:mm");
+            const afterTime = moment('17:30', "HH:mm").add(1, "minute");
+
+
+            if(events.length > 0) {
+
+                if (moment(events.value[0].start.dateTime).isAfter(moment(afterTime))) {
+                    bookUntil = afterTime;
+                } else {
+                    bookUntil = moment(events.value[0].start.dateTime);
+                }
             } else {
-                //Set first hour
-                times[hour] = [bookTime];
+                bookUntil = afterTime;
             }
-        }
 
-        //Increment the book time by 15 minutes
-        bookTime = (moment(bookTime).add(15, 'minutes'));
-    }
+            console.log(bookUntil)
+            //Iterate over the 15 minute interval until booking time reaches next booking
+            while(moment(bookTime).isBefore((bookUntil).add(1, 'minute'))) {
+
+                //Get the hour of the book time (so we can start each hour on new line)
+                let hour = moment(bookTime).format("HH");
+                if (bookTime.isBetween(beforeTime, afterTime)) {
+                    //Check if hour array exists
+                    if(hour in times) {
+                        //Set following hours
+                        times[parseInt(hour)].push(bookTime);
+                    } else {
+                        //Set first hour
+                        times[parseInt(hour)] = [bookTime];
+                    }
+
+                }
+
+                //Increment the book time by 15 minutes
+                bookTime = (moment(bookTime).add(15, 'minutes'));
+            }
+
+        });
 
     return times;
+
 }
 
 export async function createEvent(accessToken, apiData, room) {
@@ -228,13 +240,12 @@ export async function createEvent(accessToken, apiData, room) {
     };
 
     //Post data to api
-    await axios.post('https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)), apiData,config)
+    await axios.post('https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)) + 'events', apiData,config)
         .then(res => {
             result = res;
         });
 
     return result;
-
 }
 
 export async function updateEvent(accessToken, apiData, room, id) {
@@ -260,23 +271,26 @@ export async function updateEvent(accessToken, apiData, room, id) {
 
 export async function getFreeRooms(accessToken, now, room) {
 
-    const client = getAuthenticatedClient(accessToken);
-
+    let daysEvents = [];
+    let roomEvent = [];
     //Set up current day start and end vars
-    const start = moment(now).startOf("day").toISOString();
+    const start = moment(now).toISOString();
     const end = moment(now).endOf("day").toISOString();
 
-    //Get all events for the day
-    const daysEvents = await client
-        .api(getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
-        .orderby('start/DateTime ASC')
-        .get();
+    //Set up headers and access token
+    axios.defaults.headers.get['Authorization'] =
+        'Bearer ' + accessToken;
 
-    if(daysEvents.length > 0) {
-        var roomEvent = daysEvents.filter(function (event) {
-            return moment(event.start.dateTime).isSameOrBefore(moment(now)) && moment(event.end.dateTime).isSameOrAfter(moment(now))
+    //Post data to api
+    await axios.get('https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+        .then(res => {
+            daysEvents = res;
+            if(daysEvents.data.value.length > 0) {
+                 roomEvent = daysEvents.data.value.filter(function (event) {
+                     return moment(event.start.dateTime).isSameOrBefore(moment(now)) && moment(event.end.dateTime).isSameOrAfter(moment(now))
+                });
+            }
         });
-    }
 
-    return daysEvents;
+    return roomEvent;
 }

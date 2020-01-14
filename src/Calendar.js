@@ -1,7 +1,6 @@
 import React from 'react';
 import { Table } from 'reactstrap';
 import moment, {now} from 'moment';
-import config from './Config';
 import {getAPIAccessToken, getDaysEvents} from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
@@ -257,11 +256,11 @@ export default class Calendar extends React.Component {
                                         if (moment(event.start.dateTime).isSame(moment(), 'day')) {
                                             return (
                                                 <>
-                                                    <Col xs="8"><h4>{event.subject}</h4></Col>
+                                                    <Col xs="7"><h4>{event.subject}</h4></Col>
 
                                                     {/*If start date is not today*/}
 
-                                                    <Col xs="4" className="text-right">
+                                                    <Col xs="5" className="text-right">
                                                         <h4>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h4>
                                                     </Col>
                                                     <Col xs={12}><h6><span
