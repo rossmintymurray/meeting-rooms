@@ -83,7 +83,6 @@ export default class Calendar extends React.Component {
         // Get the user's access token
         var accessToken = await getAPIAccessToken();
 
-        console.log(accessToken);
         //Get Calendar view data
         var events = getDaysEvents(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
 

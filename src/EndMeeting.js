@@ -84,7 +84,6 @@ export default class EndMeeting extends React.Component {
             }
         };
 
-        console.log(accessToken);
         var result = updateEvent(accessToken,  apiData, this.props.match.params.room, this.props.match.params.id );
 
             Promise.resolve(result)

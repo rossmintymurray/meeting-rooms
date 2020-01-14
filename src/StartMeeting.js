@@ -63,7 +63,6 @@ export default class StartMeeting extends React.Component {
             var bookUntil = await getBookUntilOptions(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room );
 
             Promise.resolve(bookUntil).then((res2) => {
-                console.log(res2);
                 // Update the array of events in state
                 this.setState({times: res2});
                 this.setState({loading: false});

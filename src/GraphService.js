@@ -78,7 +78,7 @@ export async function getDaysEvents(accessToken, now, room) {
 
     //Get the now event
     const nowEvent = await getNowEvent(daysEvents.data.value, now);
-    console.log(nowEvent);
+
     //Get the next event
     const nextEvent = await getNextEvent(accessToken, daysEvents.value, now, room);
 
@@ -107,7 +107,6 @@ function getNowEvent(daysEvents, now) {
 }
 
 async function getNextEvent(accessToken, daysEvents, now, room) {
-    console.log(daysEvents);
 
     let events = [];
     let nextEvents = [];
@@ -138,7 +137,7 @@ async function getNextEvent(accessToken, daysEvents, now, room) {
 
                 let nextEvent = [];
                 nextEvent.push(nextEvents[0]);
-                console.log(nextEvent);
+
                 return nextEvent;
 
             });
@@ -165,7 +164,6 @@ export async function getBookUntilOptions(accessToken, now, room) {
     const start = moment(now).toISOString();
     const end = moment(now).endOf("day").toISOString();
 
-    console.log(accessToken);
     let events = [];
     let times = [];
 
@@ -177,8 +175,6 @@ export async function getBookUntilOptions(accessToken, now, room) {
     await axios.get('https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
         .then(res => {
             events = res.data;
-
-            console.log(events);
 
             //Get the next available 15 minute interval
             const roundedUp = Math.ceil(moment().minute() / 15) * 15;
@@ -200,7 +196,6 @@ export async function getBookUntilOptions(accessToken, now, room) {
                 bookUntil = afterTime;
             }
 
-            console.log(bookUntil)
             //Iterate over the 15 minute interval until booking time reaches next booking
             while(moment(bookTime).isBefore((bookUntil).add(1, 'minute'))) {
 
