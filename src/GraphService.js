@@ -1,60 +1,6 @@
 import axios from 'axios';
 import moment from "moment";
-import config from './Config';
 import {adalApiFetch} from './adalConfig'
-const qs = require('qs');
-
-
-export async function getAPIAccessToken() {
-    const APP_ID = config.appId;
-    const APP_SECRET = config.appSecret;
-    const TOKEN_ENDPOINT ='https://login.microsoftonline.com/' + config.tenantId + '/oauth2/v2.0/token';
-    const MS_GRAPH_SCOPE = 'https://graph.microsoft.com/.default';
-
-    // const postData = {
-    //     grant_type:'client_credentials',
-    //     client_id: APP_ID,
-    //     scope: MS_GRAPH_SCOPE,
-    //     client_secret: APP_SECRET,
-    // };
-    //
-    // let result = "";
-    //
-    // axios.defaults.headers.post['Access-Control-Allow-Origin'] =  "*";
-    // axios.defaults.headers.post['Content-Type'] =
-    //     'application/x-www-form-urlencoded';
-    //
-    // await axios.post(TOKEN_ENDPOINT, qs.stringify(postData))
-    //     .then(response => {
-    //         result = response.data["access_token"];
-    //     })
-    //     .catch(error => {
-    //         console.log(error);
-    // });
-    //
-    // return result;
-
-    // var configOptions = {
-    //     tenant: config.tenantId, // Optional by default, it sends common
-    //     clientId: APP_ID,
-    //     postLogoutRedirectUri: window.location.origin,
-    // }
-    // window.authContext = new AuthenticationContext(configOptions);
-    //
-    // var isCallback = authContext.isCallback(window.location.hash);
-    // authContext.handleWindowCallback();
-    //
-    // function getToken(){
-    //     authContext.acquireToken("https://graph.microsoft.com",function(error, token){
-    //         console.log(error);
-    //         console.log(token);
-    //     })
-    // }
-    // function login(){
-    //     authContext.login();
-    // }
-
-}
 
 function getAPIPath(room) {
     var email = "";

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Table } from 'reactstrap';
 import moment, {now} from 'moment';
-import {getAPIAccessToken, getDaysEvents} from './GraphService';
+import { getDaysEvents} from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
 import { Col } from 'reactstrap';
@@ -48,9 +48,6 @@ export default class Calendar extends React.Component {
             // Update the array of events in state
             this.setState({room_name: room_name});
 
-            // Get the user's access token
-            var accessToken = await getAPIAccessToken();
-
             //Get Calendar view data
             var events = await getDaysEvents(moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
 
@@ -80,8 +77,6 @@ export default class Calendar extends React.Component {
 
     //Call to update all calendar screen information
     async updateViewport() {
-        // Get the user's access token
-        var accessToken = await getAPIAccessToken();
 
         //Get Calendar view data
         var events = getDaysEvents(moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
