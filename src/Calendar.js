@@ -52,7 +52,7 @@ export default class Calendar extends React.Component {
             var accessToken = await getAPIAccessToken();
 
             //Get Calendar view data
-            var events = await getDaysEvents(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
+            var events = await getDaysEvents(moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
 
             // Update the array of events in state
             this.setState({events: events[0].value});
@@ -84,7 +84,7 @@ export default class Calendar extends React.Component {
         var accessToken = await getAPIAccessToken();
 
         //Get Calendar view data
-        var events = getDaysEvents(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
+        var events = getDaysEvents(moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
 
         Promise.resolve(events).then((res2) => {
             // Update the array of events in state

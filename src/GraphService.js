@@ -1,7 +1,9 @@
 import axios from 'axios';
 import moment from "moment";
 import config from './Config';
+import {adalApiFetch} from './adalConfig'
 const qs = require('qs');
+
 
 export async function getAPIAccessToken() {
     const APP_ID = config.appId;
@@ -9,27 +11,48 @@ export async function getAPIAccessToken() {
     const TOKEN_ENDPOINT ='https://login.microsoftonline.com/' + config.tenantId + '/oauth2/v2.0/token';
     const MS_GRAPH_SCOPE = 'https://graph.microsoft.com/.default';
 
-    const postData = {
-        grant_type:'client_credentials',
-        client_id: APP_ID,
-        scope: MS_GRAPH_SCOPE,
-        client_secret: APP_SECRET,
-    };
+    // const postData = {
+    //     grant_type:'client_credentials',
+    //     client_id: APP_ID,
+    //     scope: MS_GRAPH_SCOPE,
+    //     client_secret: APP_SECRET,
+    // };
+    //
+    // let result = "";
+    //
+    // axios.defaults.headers.post['Access-Control-Allow-Origin'] =  "*";
+    // axios.defaults.headers.post['Content-Type'] =
+    //     'application/x-www-form-urlencoded';
+    //
+    // await axios.post(TOKEN_ENDPOINT, qs.stringify(postData))
+    //     .then(response => {
+    //         result = response.data["access_token"];
+    //     })
+    //     .catch(error => {
+    //         console.log(error);
+    // });
+    //
+    // return result;
 
-    let result = "";
-
-    axios.defaults.headers.post['Content-Type'] =
-        'application/x-www-form-urlencoded';
-
-    await axios.post(TOKEN_ENDPOINT, qs.stringify(postData))
-        .then(response => {
-            result = response.data["access_token"];
-        })
-        .catch(error => {
-            console.log(error);
-    });
-
-    return result;
+    // var configOptions = {
+    //     tenant: config.tenantId, // Optional by default, it sends common
+    //     clientId: APP_ID,
+    //     postLogoutRedirectUri: window.location.origin,
+    // }
+    // window.authContext = new AuthenticationContext(configOptions);
+    //
+    // var isCallback = authContext.isCallback(window.location.hash);
+    // authContext.handleWindowCallback();
+    //
+    // function getToken(){
+    //     authContext.acquireToken("https://graph.microsoft.com",function(error, token){
+    //         console.log(error);
+    //         console.log(token);
+    //     })
+    // }
+    // function login(){
+    //     authContext.login();
+    // }
 
 }
 
@@ -51,7 +74,7 @@ function getAPIPath(room) {
 }
 
 //Get all events for the day and place in an array
-export async function getDaysEvents(accessToken, now, room) {
+export async function getDaysEvents(now, room) {
 
     //Set up current day start and end vars
     const start = moment(now).startOf("day").add("1", "minute").toISOString();
@@ -59,33 +82,21 @@ export async function getDaysEvents(accessToken, now, room) {
 
     let daysEvents = [];
 
-    //Set up headers and access token
-    axios.defaults.headers.get['Authorization'] =
-        'Bearer ' + accessToken;
-
-    //Post data to api
-    await axios.get('https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
-        .then(res => {
-            daysEvents = res;
-        });
-
-    //Get all events for the day
-    // const daysEvents = await client
-    //     .api(getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
-    //     .orderby('start/DateTime ASC')
-    //     .get();
-
+     await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+         .then(res => {
+                     daysEvents = res;
+     });
 
     //Get the now event
     const nowEvent = await getNowEvent(daysEvents.data.value, now);
 
     //Get the next event
-    const nextEvent = await getNextEvent(accessToken, daysEvents.value, now, room);
+    const nextEvent =  await getNextEvent(daysEvents.data.value, now, room);
 
     return [
-        daysEvents.data,
-        nowEvent,
-        nextEvent
+       daysEvents.data,
+       nowEvent,
+       nextEvent
     ];
 
 }
@@ -106,27 +117,36 @@ function getNowEvent(daysEvents, now) {
     return nowEvent;
 }
 
-async function getNextEvent(accessToken, daysEvents, now, room) {
+async function getNextEvent(daysEvents, now, room) {
 
     let events = [];
     let nextEvents = [];
 
     //Check if any daysEvents exist
-    if(!daysEvents) {
+    let nextEventIsToday = false;
+
+    if(daysEvents ) {
+        daysEvents.map((event, key) => {
+            if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
+                nextEvents.push(event);
+                nextEventIsToday = true;
+            }
+
+        })
+    }
+
+    if(!nextEventIsToday) {
         //Get events up to a week in advance
         //Set up current day start and end vars
         const start = moment(now).toISOString();
         const end = moment(now).add("1", "week").toISOString();
 
-        //Set up headers and access token
-        axios.defaults.headers.get['Authorization'] =
-            'Bearer ' + accessToken;
 
-        //Post data to api
-        await axios.get('https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+        await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
             .then(res => {
                 events = res.data.value;
 
+                console.log(res)
                 //Iterate over daysEvents finding the next one
                 events.map((event, key) => {
                     if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
@@ -141,17 +161,6 @@ async function getNextEvent(accessToken, daysEvents, now, room) {
                 return nextEvent;
 
             });
-    } else {
-        //Next event is today
-        events = daysEvents;
-
-        //Iterate over daysEvents finding the next one
-        events.map((event, key) => {
-            if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
-                nextEvents.push(event);
-            }
-            return false;
-        });
     }
     //Remove all but the first item in the array
     let nextEvent = [];
@@ -172,7 +181,7 @@ export async function getBookUntilOptions(accessToken, now, room) {
         'Bearer ' + accessToken;
 
     //Post data to api
-    await axios.get('https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+    await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
         .then(res => {
             events = res.data;
 
@@ -235,7 +244,7 @@ export async function createEvent(accessToken, apiData, room) {
     };
 
     //Post data to api
-    await axios.post('https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)) + 'events', apiData,config)
+    await adalApiFetch(axios.post,'https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)) + 'events', apiData,config)
         .then(res => {
             result = res;
         });
@@ -255,7 +264,7 @@ export async function updateEvent(accessToken, apiData, room, id) {
     };
 
     //Post data to api
-    await axios.patch('https://graph.microsoft.com/v1.0'  + (getAPIPath(room)) + 'events/' + id, apiData,config)
+    await adalApiFetch(axios.patch,'https://graph.microsoft.com/v1.0'  + (getAPIPath(room)) + 'events/' + id, apiData,config)
         .then(res => {
             result = res;
         });
@@ -277,7 +286,7 @@ export async function getFreeRooms(accessToken, now, room) {
         'Bearer ' + accessToken;
 
     //Post data to api
-    await axios.get('https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+    await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
         .then(res => {
             daysEvents = res;
             if(daysEvents.data.value.length > 0) {
