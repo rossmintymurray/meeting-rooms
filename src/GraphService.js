@@ -77,6 +77,7 @@ async function getNextEvent(daysEvents, now, room) {
                 nextEvents.push(event);
                 nextEventIsToday = true;
             }
+            return false;
 
         })
     }
