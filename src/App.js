@@ -9,7 +9,6 @@ import StartMeeting from './StartMeeting';
 import ExtendMeeting from './ExtendMeeting';
 import EndMeeting from './EndMeeting';
 import FindRoom from './FindRoom';
-import Unsplash from 'react-unsplash-wrapper'
 import moment from "moment";
 
 //Date and time functions (for displaying the header
@@ -35,7 +34,7 @@ class App extends Component {
             error: null,
             imageUrl: null,
             time: getTime(),
-            backgroundImage: "",
+            backgroundImage: "https://source.unsplash.com/768x1024/?nature,mountains,water,mountain,snow,lakes,lake,travel",
         };
 
     }
@@ -43,19 +42,14 @@ class App extends Component {
     //On mount (load)
     async componentDidMount() {
 
-        // try {
-        //     // Get the user's access token
-        //     var accessToken = await window.msal.acquireTokenSilent({
-        //         scopes: config.scopes
-        //     });
-        // }
-        // catch(err) {
-        //     alert("there has been a problem loading the user")
-        // }
+        this.intervalID = setInterval(
+            () =>this.tick(),
+            1000
+        );
 
         this.intervalID = setInterval(
             () => this.refreshBackground(),
-            1000
+            60 * 60000 //1 Hour
         );
 
     }
@@ -74,8 +68,9 @@ class App extends Component {
 
     //Refresh background picture
     refreshBackground() {
+
         this.setState({
-            backgroundImage: this.state.backgroundImage + "1"
+            backgroundImage: this.state.backgroundImage + 1
         });
         this.tick();
     }
@@ -93,12 +88,7 @@ class App extends Component {
         return (
 
             <Router>
-                <div className="bg-image" style={{ backgroundImage: imageUrl }}>
-                    <Unsplash
-                        width="768"
-                        height="1024"
-                        keywords="scenic, mountain, mountains, landscape, nature"
-                    />
+                <div className="bg-image" style={{backgroundImage: "url(' " + imageUrl + "')" }}>
                 </div>
 
                 <div>
