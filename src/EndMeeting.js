@@ -80,7 +80,7 @@ export default class EndMeeting extends React.Component {
             }
         };
 
-        var result = updateEvent(apiData, this.props.match.params.room, this.props.match.params.id );
+        var result = await updateEvent(apiData, this.props.match.params.room, this.props.match.params.id );
 
             Promise.resolve(result)
                 .then((res2) => {

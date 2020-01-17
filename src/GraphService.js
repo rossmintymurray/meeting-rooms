@@ -1,6 +1,8 @@
 import axios from 'axios';
 import moment from "moment";
-import {adalApiFetch} from './adalConfig'
+import {getAdalAccessToken, adalApiFetch} from './adalConfig'
+
+axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 function getAPIPath(room) {
     var email = "";
@@ -134,7 +136,7 @@ export async function getBookUntilOptions(now, room) {
             let bookUntil = "";
             //Only show book times between these
             const beforeTime = moment('08:30', "HH:mm");
-            const afterTime = moment('17:30', "HH:mm").add(1, "minute");
+            const afterTime = moment('23:30', "HH:mm").add(1, "minute");
 
 
             if(events.length > 0) {
@@ -177,11 +179,18 @@ export async function getBookUntilOptions(now, room) {
 
 export async function createEvent(apiData, room) {
 
+    const accessToken = await getAdalAccessToken();
     let result = [];
     //Set up headers and access token
+    let config = {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: 'Bearer ' + accessToken
+        }
+    };
 
     //Post data to api
-    await adalApiFetch(axios.post,'https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)) + 'events', apiData)
+    await axios.post('https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)) + 'events', apiData,config)
         .then(res => {
             result = res;
         });
@@ -191,15 +200,25 @@ export async function createEvent(apiData, room) {
 
 export async function updateEvent(apiData, room, id) {
 
+    const accessToken = await getAdalAccessToken();
+
     let result = [];
     //Set up headers and access token
+    let config = {
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: 'Bearer ' + accessToken
+        }
+    };
+
 
     //Post data to api
-    await adalApiFetch(axios.patch,'https://graph.microsoft.com/v1.0'  + (getAPIPath(room)) + 'events/' + id, apiData)
+    await axios.patch('https://graph.microsoft.com/v1.0'  + (getAPIPath(room)) + 'events/' + id, apiData,config)
         .then(res => {
             result = res;
         });
 
+    console.log(result)
     return result;
 
 }

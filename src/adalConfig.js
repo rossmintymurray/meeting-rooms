@@ -1,4 +1,4 @@
-import { AuthenticationContext, adalFetch } from 'react-adal';
+import { AuthenticationContext, adalFetch, adalGetToken } from 'react-adal';
 import config from './Config';
 
 export const adalConfig = {
@@ -15,3 +15,7 @@ export const authContext = new AuthenticationContext(adalConfig);
 
 export const adalApiFetch = (fetch, url, options) =>
     adalFetch(authContext, adalConfig.endpoints.api, fetch, url, options);
+
+export const getAdalAccessToken = () =>
+    adalGetToken(authContext, adalConfig.endpoints.api)
+
