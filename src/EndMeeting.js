@@ -1,7 +1,6 @@
 import React from 'react';
 import moment from 'moment';
 
-import { getAPIAccessToken } from './GraphService';
 import { updateEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
@@ -73,9 +72,6 @@ export default class EndMeeting extends React.Component {
 
         event.preventDefault();
 
-        // Get the user's access token
-        var accessToken = await getAPIAccessToken();
-
         //Set the data to update
         const apiData = {
             end: {
@@ -84,7 +80,7 @@ export default class EndMeeting extends React.Component {
             }
         };
 
-        var result = updateEvent(accessToken,  apiData, this.props.match.params.room, this.props.match.params.id );
+        var result = updateEvent(apiData, this.props.match.params.room, this.props.match.params.id );
 
             Promise.resolve(result)
                 .then((res2) => {

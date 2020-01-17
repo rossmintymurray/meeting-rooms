@@ -114,17 +114,13 @@ async function getNextEvent(daysEvents, now, room) {
     return nextEvent;
 }
 
-export async function getBookUntilOptions(accessToken, now, room) {
+export async function getBookUntilOptions(now, room) {
     //Set up now start and end vars
     const start = moment(now).toISOString();
     const end = moment(now).endOf("day").toISOString();
 
     let events = [];
     let times = [];
-
-    //Set up headers and access token
-    axios.defaults.headers.get['Authorization'] =
-        'Bearer ' + accessToken;
 
     //Post data to api
     await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
@@ -178,19 +174,13 @@ export async function getBookUntilOptions(accessToken, now, room) {
 
 }
 
-export async function createEvent(accessToken, apiData, room) {
+export async function createEvent(apiData, room) {
 
     let result = [];
     //Set up headers and access token
-    let config = {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: 'Bearer ' + accessToken
-        }
-    };
 
     //Post data to api
-    await adalApiFetch(axios.post,'https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)) + 'events', apiData,config)
+    await adalApiFetch(axios.post,'https://graph.microsoft.com/v1.0/'  + (getAPIPath(room)) + 'events', apiData)
         .then(res => {
             result = res;
         });
@@ -198,19 +188,13 @@ export async function createEvent(accessToken, apiData, room) {
     return result;
 }
 
-export async function updateEvent(accessToken, apiData, room, id) {
+export async function updateEvent(apiData, room, id) {
 
     let result = [];
     //Set up headers and access token
-    let config = {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: 'Bearer ' + accessToken
-        }
-    };
 
     //Post data to api
-    await adalApiFetch(axios.patch,'https://graph.microsoft.com/v1.0'  + (getAPIPath(room)) + 'events/' + id, apiData,config)
+    await adalApiFetch(axios.patch,'https://graph.microsoft.com/v1.0'  + (getAPIPath(room)) + 'events/' + id, apiData)
         .then(res => {
             result = res;
         });
@@ -219,17 +203,13 @@ export async function updateEvent(accessToken, apiData, room, id) {
 
 }
 
-export async function getFreeRooms(accessToken, now, room) {
+export async function getFreeRooms(now, room) {
 
     let daysEvents = [];
     let roomEvent = [];
     //Set up current day start and end vars
     const start = moment(now).toISOString();
     const end = moment(now).endOf("day").toISOString();
-
-    //Set up headers and access token
-    axios.defaults.headers.get['Authorization'] =
-        'Bearer ' + accessToken;
 
     //Post data to api
     await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)

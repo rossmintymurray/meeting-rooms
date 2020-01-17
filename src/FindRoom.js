@@ -1,6 +1,6 @@
 import React from 'react';
 import moment from 'moment';
-import {getAPIAccessToken, getFreeRooms} from './GraphService';
+import {getFreeRooms} from './GraphService';
 
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
@@ -33,13 +33,10 @@ export default class FindRoom extends React.Component {
     async componentDidMount() {
         try {
 
-            // Get the user's access token
-            var accessToken = await getAPIAccessToken();
-
             //Iterate over the rooms
             await this.state.rooms.map((room, i) => {
                 // Get the user's events (table)
-                var freeRooms =  getFreeRooms(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), room);
+                var freeRooms =  getFreeRooms(moment().format('YYYY-MM-DDTHH:mm:ss'), room);
 
                 //Resolve promise
                 Promise.resolve(freeRooms).then((res2) => {

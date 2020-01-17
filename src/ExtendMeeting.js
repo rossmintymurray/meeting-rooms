@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 
-import {getAPIAccessToken, getBookUntilOptions} from './GraphService';
+import { getBookUntilOptions} from './GraphService';
 import { updateEvent } from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
@@ -51,12 +51,8 @@ export default class ExtendMeeting extends React.Component {
             // Update the array of events in state
             this.setState({room_name: room_name});
 
-            // Get the user's access token
-            var accessToken = await getAPIAccessToken();
-
-
             // Get the book until options (times that the room is bookable until in 15 min increments)
-            var bookUntil = await getBookUntilOptions(accessToken, moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room );
+            var bookUntil = await getBookUntilOptions(moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room );
 
             console.log(bookUntil);
 
@@ -97,14 +93,11 @@ export default class ExtendMeeting extends React.Component {
             }
         };
 
-        // Get the user's access token
-        var accessToken =  await getAPIAccessToken();
-
         event.preventDefault();
 
         //Resolve access token promise so we can send the accessToken value to MS Graph
                 //Post event
-        var result =  updateEvent(accessToken,  apiData, this.props.match.params.room, this.props.match.params.id );
+        var result =  updateEvent(apiData, this.props.match.params.room, this.props.match.params.id );
 
 
         Promise.resolve(result)
