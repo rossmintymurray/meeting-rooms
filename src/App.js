@@ -4,7 +4,6 @@ import { Col, Container, Row } from 'reactstrap';
 import ErrorMessage from './ErrorMessage';
 import Welcome from './Welcome';
 import 'bootstrap/dist/css/bootstrap.css';
-import  {getAPIAccessToken}  from './GraphService';
 import Calendar from './Calendar';
 import StartMeeting from './StartMeeting';
 import ExtendMeeting from './ExtendMeeting';
@@ -29,13 +28,9 @@ class App extends Component {
     constructor(props) {
         super(props);
 
-        //Get access token with API key
-        const accessToken = getAPIAccessToken();
-
         //Set up states
         this.state = {
             isAuthenticated: true,
-            accessToken: accessToken,
             user: {},
             error: null,
             imageUrl: null,
