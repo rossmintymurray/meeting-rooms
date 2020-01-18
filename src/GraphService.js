@@ -136,7 +136,7 @@ export async function getBookUntilOptions(now, room) {
             let bookUntil = "";
             //Only show book times between these
             const beforeTime = moment('08:30', "HH:mm");
-            const afterTime = moment('23:30', "HH:mm").add(1, "minute");
+            const afterTime = moment('17:30', "HH:mm").add(1, "minute");
 
 
             if(events.length > 0) {
