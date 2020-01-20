@@ -138,8 +138,7 @@ export async function getBookUntilOptions(now, room) {
             const beforeTime = moment('08:30', "HH:mm");
             const afterTime = moment('17:30', "HH:mm").add(1, "minute");
 
-
-            if(events.length > 0) {
+            if(events.value.length > 0) {
 
                 if (moment(events.value[0].start.dateTime).isAfter(moment(afterTime))) {
                     bookUntil = afterTime;

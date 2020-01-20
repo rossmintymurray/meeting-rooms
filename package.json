@@ -25,7 +25,8 @@
     "react-unsplash-wrapper": "^1.1.5",
     "reactstrap": "^8.2.0",
     "sweetalert2-react": "^0.8.3",
-    "typescript": "^3.7.3"
+    "typescript": "^3.7.3",
+    "unsplash-js": "^6.0.0"
   },
   "scripts": {
     "start": "HTTPS=true react-scripts start",
