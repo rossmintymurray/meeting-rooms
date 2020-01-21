@@ -93,8 +93,7 @@ async function getNextEvent(daysEvents, now, room) {
         const start = moment(now).toISOString();
         const end = moment(now).add("1", "week").toISOString();
 
-
-        await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+        await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end + "&$orderby=start/dateTime asc")
             .then(res => {
                 events = res.data.value;
 
