@@ -328,8 +328,14 @@ export default class Calendar extends React.Component {
                                         {this.state.events.map((event, i) => {
 
                                             var style = "";
+
+                                            //If event in the past
                                             if (moment(event.end.dateTime).isBefore(moment())) {
                                                 style = "expired";
+
+                                            //If current event
+                                            } else if (moment(event.start.dateTime).isSameOrBefore(moment()) && (moment(event.end.dateTime).isSameOrAfter(moment()) )) {
+                                                style = "current";
                                             }
 
                                             //Check if booked by the room, display 1st attendee if so.

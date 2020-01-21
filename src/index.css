@@ -23,12 +23,16 @@ tr.expired {
     color:#B3B3B3;
 }
 
+tr.current {
+    background-color:#238276;
+}
+
 .header  {
     border-bottom:1px solid #fff;
 }
 
 .room-name {
-    margin-top: 40px;
+    margin-top: 50px;
     margin-bottom: 30px;
     font-size: 3em;
 }
