@@ -11,7 +11,7 @@ body {
 #root {
     background-color: #282c34;
     color:#F8F9F8;
-    padding-top:50px;
+    padding-top:20px;
     min-height:1024px;
 }
 
@@ -28,7 +28,9 @@ tr.expired {
 }
 
 .room-name {
-    margin-top:20px;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    font-size: 3em;
 }
 
 .section {
