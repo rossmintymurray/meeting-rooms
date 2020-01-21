@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table } from 'reactstrap';
-import moment, {now} from 'moment';
+import moment from 'moment';
 import { getDaysEvents} from './GraphService';
 import { Container } from 'reactstrap';
 import { Row } from 'reactstrap';
