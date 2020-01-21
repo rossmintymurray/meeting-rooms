@@ -123,7 +123,7 @@ async function getBookUntilTime(now, room) {
     const start = moment(now).toISOString();
     const end = moment(now).endOf("day").toISOString();
 
-    const afterTime = moment('23:30', "HH:mm").add(1, "minute");
+    const afterTime = moment('18:00', "HH:mm").add(1, "minute");
 
     let events = [];
 
@@ -163,7 +163,7 @@ export async function getBookUntilOptions(now, room) {
 
     //Only show book times between these
     const beforeTime = moment('08:30', "HH:mm");
-    const afterTime = moment('23:30', "HH:mm").add(1, "minute");
+    const afterTime = moment('18:00', "HH:mm").add(1, "minute");
 
     //Get book until time
     const bookUntil = await getBookUntilTime(now, room, afterTime);
