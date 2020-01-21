@@ -127,26 +127,36 @@ async function getBookUntilTime(now, room) {
 
     let events = [];
 
-    let bookUntil = "";
+    let bookUntil = [];
     //Post data to api
-    await adalApiFetch(axios.get, 'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+    await adalApiFetch(axios.get, 'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end + "&$orderby=start/dateTime asc")
         .then(res => {
             events = res.data;
 
             if (events.value.length > 0) {
 
-                if (moment(events.value[0].start.dateTime).isAfter(moment(afterTime))) {
-                    bookUntil = afterTime;
-                } else {
-                    bookUntil = moment(events.value[0].start.dateTime);
-                }
+                //Iterate over daysEvents finding the next one
+                events.value.map((event, key) => {
+
+                    //If the start time of the returned event is after last time - afterTime
+                    if (moment(event.start.dateTime).isAfter(moment(afterTime))) {
+                        bookUntil.push(afterTime);
+
+                        //If start time of returned event is before now
+                    } else if (moment(event.start.dateTime).isBefore(moment(now))) {
+                        bookUntil.push(afterTime);
+                    } else {
+                        bookUntil.push(moment(event.start.dateTime));
+                    }
+
+                });
             } else {
-                bookUntil = afterTime;
+                bookUntil.push(afterTime);
             }
-            return bookUntil;
+
         });
 
-    return bookUntil;
+    return moment.min(bookUntil);
 }
 
 export async function getBookUntilOptions(now, room) {
