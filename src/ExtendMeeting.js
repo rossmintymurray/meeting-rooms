@@ -54,8 +54,6 @@ export default class ExtendMeeting extends React.Component {
             // Get the book until options (times that the room is bookable until in 15 min increments)
             var bookUntil = await getBookUntilOptions(moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room );
 
-            console.log(bookUntil);
-
             // Update the array of events in state
             this.setState({times: bookUntil});
 

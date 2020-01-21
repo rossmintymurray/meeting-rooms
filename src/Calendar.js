@@ -51,10 +51,12 @@ export default class Calendar extends React.Component {
             //Get Calendar view data
             var events = await getDaysEvents(moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
 
+
             // Update the array of events in state
             this.setState({events: events[0].value});
             this.setState({now: events[1]});
             this.setState({next: events[2]});
+            this.setState({bookUntil: events[3]});
 
             //Set the update interval of events
             this.intervalID = setInterval(
@@ -79,13 +81,14 @@ export default class Calendar extends React.Component {
     async updateViewport() {
 
         //Get Calendar view data
-        var events = getDaysEvents(moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
+        var events = await getDaysEvents(moment().format('YYYY-MM-DDTHH:mm:ss'), this.props.match.params.room);
 
         Promise.resolve(events).then((res2) => {
             // Update the array of events in state
             this.setState({events: res2[0].value});
             this.setState({now: res2[1]});
             this.setState({next: res2[2]});
+            this.setState({bookUntil: events[3]});
         });
 
     }
@@ -109,6 +112,10 @@ export default class Calendar extends React.Component {
     }
 
     render() {
+
+        //Work out time remaining for a free room
+        var duration = moment.duration(moment().diff(moment(this.state.bookUntil)));
+        let remainingMeetingTime = duration.humanize(); //duration.hours() + " hrs and " + duration.minutes() +"mins";
 
         const nowLength = this.state.now.length;
         const startMeetingLink = "/calendar/" + this.props.match.params.room + "/start-meeting";
@@ -195,12 +202,14 @@ export default class Calendar extends React.Component {
 
                                                 return (
                                                     <>
-                                                        <Col xs="8"><h2>Room Available</h2></Col>
+                                                        <Col xs="8">
+                                                            <h2>Room Available</h2>
+                                                            <h4><span className="light">~ {remainingMeetingTime} remaining</span></h4>
+                                                        </Col>
                                                         <Col xs="4" className="text-right">
                                                             <Link to={startMeetingLink}>
                                                                 <Button variant="success" size="lg">Start Meeting</Button>
                                                             </Link>
-
                                                         </Col>
 
                                                     </>
@@ -213,12 +222,14 @@ export default class Calendar extends React.Component {
                                     ) :
                                     (
                                         <>
-                                            <Col xs="8"><h2>Room Available</h2></Col>
+                                            <Col xs="8">
+                                                <h2>Room Available</h2>
+                                                <h4><small><span className="light">~ {remainingMeetingTime} remaining</span></small></h4>
+                                            </Col>
                                             <Col xs="4" className="text-right">
                                                 <Link to={startMeetingLink}>
                                                     <Button variant="success" size="lg">Start Meeting</Button>
                                                 </Link>
-
                                             </Col>
 
                                         </>
@@ -317,7 +328,7 @@ export default class Calendar extends React.Component {
                                         {this.state.events.map((event, i) => {
 
                                             var style = "";
-                                            if (moment(event.end.dateTime).isBefore(moment(now()))) {
+                                            if (moment(event.end.dateTime).isBefore(moment())) {
                                                 style = "expired";
                                             }
 

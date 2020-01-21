@@ -41,10 +41,13 @@ export async function getDaysEvents(now, room) {
     //Get the next event
     const nextEvent =  await getNextEvent(daysEvents.data.value, now, room);
 
+    const bookUntil = await getBookUntilTime(now, room);
+
     return [
        daysEvents.data,
        nowEvent,
-       nextEvent
+       nextEvent,
+        bookUntil
     ];
 
 }
@@ -95,7 +98,6 @@ async function getNextEvent(daysEvents, now, room) {
             .then(res => {
                 events = res.data.value;
 
-                console.log(res)
                 //Iterate over daysEvents finding the next one
                 events.map((event, key) => {
                     if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
@@ -117,28 +119,22 @@ async function getNextEvent(daysEvents, now, room) {
     return nextEvent;
 }
 
-export async function getBookUntilOptions(now, room) {
+async function getBookUntilTime(now, room) {
     //Set up now start and end vars
     const start = moment(now).toISOString();
     const end = moment(now).endOf("day").toISOString();
 
-    let events = [];
-    let times = [];
+    const afterTime = moment('23:30', "HH:mm").add(1, "minute");
 
+    let events = [];
+
+    let bookUntil = "";
     //Post data to api
-    await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+    await adalApiFetch(axios.get, 'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
         .then(res => {
             events = res.data;
 
-            //Get the next available 15 minute interval
-            const roundedUp = Math.ceil(moment().minute() / 15) * 15;
-            let bookTime = moment().minute(roundedUp).second(0);
-            let bookUntil = "";
-            //Only show book times between these
-            const beforeTime = moment('08:30', "HH:mm");
-            const afterTime = moment('17:30', "HH:mm").add(1, "minute");
-
-            if(events.value.length > 0) {
+            if (events.value.length > 0) {
 
                 if (moment(events.value[0].start.dateTime).isAfter(moment(afterTime))) {
                     bookUntil = afterTime;
@@ -148,29 +144,46 @@ export async function getBookUntilOptions(now, room) {
             } else {
                 bookUntil = afterTime;
             }
+            return bookUntil;
+        });
 
-            //Iterate over the 15 minute interval until booking time reaches next booking
-            while(moment(bookTime).isBefore((bookUntil).add(1, 'minute'))) {
+    return bookUntil;
+}
 
-                //Get the hour of the book time (so we can start each hour on new line)
-                let hour = moment(bookTime).format("HH");
-                if (bookTime.isBetween(beforeTime, afterTime)) {
-                    //Check if hour array exists
-                    if(hour in times) {
-                        //Set following hours
-                        times[parseInt(hour)].push(bookTime);
-                    } else {
-                        //Set first hour
-                        times[parseInt(hour)] = [bookTime];
-                    }
+export async function getBookUntilOptions(now, room) {
 
+    //Only show book times between these
+    const beforeTime = moment('08:30', "HH:mm");
+    const afterTime = moment('23:30', "HH:mm").add(1, "minute");
+
+    //Get book until time
+    const bookUntil = await getBookUntilTime(now, room, afterTime);
+
+    //Get the next available 15 minute interval
+    const roundedUp = Math.ceil(moment().minute() / 15) * 15;
+    let bookTime = moment().minute(roundedUp).second(0);
+
+    let times = [];
+        //Iterate over the 15 minute interval until booking time reaches next booking
+        while(moment(bookTime).isBefore((bookUntil).add(1, 'minute'))) {
+
+            //Get the hour of the book time (so we can start each hour on new line)
+            let hour = moment(bookTime).format("HH");
+            if (bookTime.isBetween(beforeTime, afterTime)) {
+                //Check if hour array exists
+                if(hour in times) {
+                    //Set following hours
+                    times[parseInt(hour)].push(bookTime);
+                } else {
+                    //Set first hour
+                    times[parseInt(hour)] = [bookTime];
                 }
-
-                //Increment the book time by 15 minutes
-                bookTime = (moment(bookTime).add(15, 'minutes'));
             }
 
-        });
+            //Increment the book time by 15 minutes
+            bookTime = (moment(bookTime).add(15, 'minutes'));
+        }
+
 
     return times;
 
@@ -217,7 +230,6 @@ export async function updateEvent(apiData, room, id) {
             result = res;
         });
 
-    console.log(result)
     return result;
 
 }
