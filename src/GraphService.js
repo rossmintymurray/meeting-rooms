@@ -148,7 +148,7 @@ async function getBookUntilTime(now, room) {
                     } else {
                         bookUntil.push(moment(event.start.dateTime));
                     }
-
+                    return false;
                 });
             } else {
                 bookUntil.push(afterTime);
