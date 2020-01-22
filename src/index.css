@@ -1,5 +1,7 @@
+html {
+    background-color: #0A0A0A;
+}
 body {
-
     width:768px;
 }
 
@@ -9,7 +11,7 @@ body {
     white-space: pre-wrap;
 }
 #root {
-    background-color: #282c34;
+    background-color: #0A0A0A;
     color:#F8F9F8;
     padding-top:20px;
     min-height:1024px;
