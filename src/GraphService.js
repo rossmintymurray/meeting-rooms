@@ -30,7 +30,7 @@ export async function getDaysEvents(now, room) {
 
     let daysEvents = [];
 
-     await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
+     await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end + "&$orderby=start/dateTime asc")
          .then(res => {
                      daysEvents = res;
      });
