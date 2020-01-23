@@ -54,18 +54,11 @@ export async function getDaysEvents(now, room) {
 
 function getNowEvent(daysEvents, now) {
 
-    var nowEvent =  daysEvents.filter(function(event) {
+    daysEvents.filter(function(event) {
         return moment(event.start.dateTime).isSameOrBefore(moment(now)) &&  moment(event.end.dateTime).isSameOrAfter(moment(now))
     });
 
-    //Iterate over daysEvents checking if there is one now
-    //  daysEvents.map((event, key) => {
-    //      if (moment(event.start.dateTime).isSameOrBefore(moment(now)) &&  moment(event.end.dateTime).isSameOrAfter(moment(now))) {
-    //          nowEvent = event;
-    //      }
-    //  });
-
-    return nowEvent;
+    return false;
 }
 
 async function getNextEvent(daysEvents, now, room) {
@@ -76,7 +69,7 @@ async function getNextEvent(daysEvents, now, room) {
     //Check if any daysEvents exist
     let nextEventIsToday = false;
 
-    if(daysEvents ) {
+    if(daysEvents) {
         daysEvents.map((event, key) => {
             if (moment(event.start.dateTime).isSameOrAfter(moment(now))) {
                 nextEvents.push(event);
@@ -106,6 +99,8 @@ async function getNextEvent(daysEvents, now, room) {
                 });
 
                 let nextEvent = [];
+
+                //Add the first one (the next) to the return array
                 nextEvent.push(nextEvents[0]);
 
                 return nextEvent;
@@ -243,24 +238,28 @@ export async function updateEvent(apiData, room, id) {
 
 }
 
-export async function getFreeRooms(now, room) {
+export async function getFreeRooms(now, rooms) {
 
-    let daysEvents = [];
-    let roomEvent = [];
-    //Set up current day start and end vars
-    const start = moment(now).toISOString();
-    const end = moment(now).endOf("day").toISOString();
+    let freeRooms = [];
+    //Iterate over each room
+     await rooms.map(async (room, i) => {
 
-    //Post data to api
-    await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end)
-        .then(res => {
-            daysEvents = res;
-            if(daysEvents.data.value.length > 0) {
-                 roomEvent = daysEvents.data.value.filter(function (event) {
-                     return moment(event.start.dateTime).isSameOrBefore(moment(now)) && moment(event.end.dateTime).isSameOrAfter(moment(now))
-                });
-            }
-        });
+        const daysEvents = await getDaysEvents(now, room);
 
-    return roomEvent;
+        //Determine if the room is free
+        if(await getNowEvent(daysEvents[0].value, now) === false) {
+
+            //Work out time remaining for a free room
+            var duration = moment.duration(moment().diff(daysEvents[3]));
+            let remainingMeetingTime = duration.humanize();
+
+            //Add the room and its bookUntil time, to the array
+            freeRooms.push({room: room, remainingMeetingTime: remainingMeetingTime});
+        }
+
+    });
+
+     console.log(freeRooms)
+    return freeRooms;
+
 }

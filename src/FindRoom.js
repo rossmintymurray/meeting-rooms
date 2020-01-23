@@ -33,26 +33,14 @@ export default class FindRoom extends React.Component {
     async componentDidMount() {
         try {
 
-            //Iterate over the rooms
-            await this.state.rooms.map((room, i) => {
-                // Get the user's events (table)
-                var freeRooms =  getFreeRooms(moment().format('YYYY-MM-DDTHH:mm:ss'), room);
+            // Get the free rooms and add to state
+            let freeRooms =  await getFreeRooms(moment().format('YYYY-MM-DDTHH:mm:ss'), this.state.rooms)
+                .then(
+                    this.setState({loading: false})
+                );
 
-                //Resolve promise
-                Promise.resolve(freeRooms).then((res2) => {
-                    //Check that the events are not now
-                    if(res2.length === 0) {
-                        //this.props.history.push('/calendar/' + this.props.match.params.room);
-                        this.state.freeRooms.push(room);
-                    }
-
-
-                });
-
-                return false;
-            });
-
-            this.setState({loading: false});
+            this.setState({freeRooms: freeRooms});
+            console.log(this.state.freeRooms);
 
         }
         catch(err) {
@@ -110,7 +98,10 @@ export default class FindRoom extends React.Component {
                         {this.state.freeRooms.map((room, i) => {
                             return (
                                 <>
-                                    <Col xs="8" className="bottom-spacer"><h2>{this.getRoomName(room)}</h2></Col>
+                                    <Col xs="8" className="bottom-spacer">
+                                        <h2>{this.getRoomName(room.room)}</h2>
+                                        <h4><small><span className="light">~ {room.remainingMeetingTime} remaining</span></small></h4>
+                                    </Col>
                                 </>
                             )
                         })}
