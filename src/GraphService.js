@@ -259,7 +259,6 @@ export async function getFreeRooms(now, rooms) {
 
     });
 
-     console.log(freeRooms)
     return freeRooms;
 
 }

@@ -40,7 +40,6 @@ export default class FindRoom extends React.Component {
                 );
 
             this.setState({freeRooms: freeRooms});
-            console.log(this.state.freeRooms);
 
         }
         catch(err) {
