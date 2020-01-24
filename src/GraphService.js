@@ -54,11 +54,13 @@ export async function getDaysEvents(now, room) {
 
 function getNowEvent(daysEvents, now) {
 
-    daysEvents.filter(function(event) {
+    let nowEvent = false;
+
+    nowEvent = daysEvents.filter(function(event) {
         return moment(event.start.dateTime).isSameOrBefore(moment(now)) &&  moment(event.end.dateTime).isSameOrAfter(moment(now))
     });
 
-    return false;
+    return nowEvent;
 }
 
 async function getNextEvent(daysEvents, now, room) {
@@ -118,7 +120,7 @@ async function getBookUntilTime(now, room) {
     const start = moment(now).toISOString();
     const end = moment(now).endOf("day").toISOString();
 
-    const afterTime = moment('23:00', "HH:mm").add(1, "minute");
+    const afterTime = moment('18:00', "HH:mm").add(1, "minute");
 
     let events = [];
 
@@ -158,10 +160,11 @@ export async function getBookUntilOptions(now, room) {
 
     //Only show book times between these
     const beforeTime = moment('08:30', "HH:mm");
-    const afterTime = moment('23:00', "HH:mm").add(1, "minute");
+    const afterTime = moment('18:00', "HH:mm");
 
     //Get book until time
     const bookUntil = await getBookUntilTime(now, room, afterTime);
+    console.log(bookUntil);
 
     //Get the next available 15 minute interval
     const roundedUp = Math.ceil(moment().minute() / 15) * 15;
@@ -169,8 +172,9 @@ export async function getBookUntilOptions(now, room) {
 
     let times = [];
         //Iterate over the 15 minute interval until booking time reaches next booking
-        while(moment(bookTime).isBefore((bookUntil).add(1, 'minute'))) {
+        while(moment(bookTime).isSameOrBefore((bookUntil))) {
 
+            console.log(bookTime);
             //Get the hour of the book time (so we can start each hour on new line)
             let hour = moment(bookTime).format("HH");
             if (bookTime.isBetween(beforeTime, afterTime)) {
