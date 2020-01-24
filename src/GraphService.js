@@ -251,7 +251,7 @@ export async function getFreeRooms(now, rooms) {
         const daysEvents = await getDaysEvents(now, room);
 
         //Determine if the room is free
-        if(await getNowEvent(daysEvents[0].value, now) === false) {
+        if(await getNowEvent(daysEvents[0].value, now).length === 0) {
 
             //Work out time remaining for a free room
             var duration = moment.duration(moment().diff(daysEvents[3]));
