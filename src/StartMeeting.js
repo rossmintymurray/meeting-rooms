@@ -219,6 +219,10 @@ export default class StartMeeting extends React.Component {
                                         name="email"
                                         value={this.state.email}
                                         onChange={this.handleChange}
+                                        autocomplete="off"
+                                        autocorrect="off"
+                                        autocapitalize="off"
+                                        spellcheck="false"
                                     />
                                     <InputGroup.Append>
                                         <InputGroup.Text id="basic-addon2">@aspin.co.uk</InputGroup.Text>
