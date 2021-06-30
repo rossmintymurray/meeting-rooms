@@ -1,20 +1,24 @@
-# pull official base image
-FROM node:13.12.0-alpine
+# Set the base image to node:12-alpine
+FROM node:12-alpine as build
 
-# set working directory
+# Specify where our app will live in the container
 WORKDIR /app
 
-# add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
+# Copy the React App to the container
+COPY . /app/
 
-# install app dependencies
-COPY package.json ./
-COPY package-lock.json ./
-RUN npm install --silent
-RUN npm install react-scripts@3.4.1 -g --silent
+# Prepare the container for building React
+RUN npm install
+RUN npm install react-scripts@3.0.1 -g
+# We want the production version
+RUN npm run build
 
-# add app
-COPY . ./
+# Prepare nginx
+FROM nginx:1.16.0-alpine
+COPY --from=build /app/build /usr/share/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
+COPY nginx/nginx.conf /etc/nginx/conf.d
 
-# start app
-CMD ["npm", "start"]
+# Fire up nginx
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
