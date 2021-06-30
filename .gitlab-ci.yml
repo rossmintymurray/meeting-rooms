@@ -28,8 +28,6 @@ build:
     - docker
 
 docker-build:
-  only:
-    - main
   stage: docker-build
   image: docker:latest
   before_script:
