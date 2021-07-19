@@ -18,10 +18,10 @@ const override = css`
 `;
 // Helper function to format Graph date/time
 function formatDateTime(dateTime) {
-    return moment.utc(dateTime).local().format('h:mma');
+    return moment.utc(dateTime).format('h:mma');
 }
 function getDay(dateTime) {
-    return moment.utc(dateTime).local().format('dddd Do MMMM');
+    return moment.utc(dateTime).format('dddd Do MMMM');
 }
 
 export default class Calendar extends React.Component {

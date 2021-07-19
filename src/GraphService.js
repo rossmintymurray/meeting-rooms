@@ -25,12 +25,20 @@ function getAPIPath(room) {
 export async function getDaysEvents(now, room) {
 
     //Set up current day start and end vars
-    const start = moment(now).startOf("day").add("1", "minute").toISOString();
-    const end = moment(now).endOf("day").toISOString();
+    const start = moment.utc().startOf("day").add("1", "minute").toISOString();
+    const end = moment.utc().endOf("day").toISOString();
 
     let daysEvents = [];
 
-     await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end + "&$orderby=start/dateTime asc")
+    let config = {
+        headers: {
+            "Content-Type": "application/json",
+            "Prefer": "outlook.timezone=\"Europe/London\""
+        }
+    };
+
+    //Post data to api
+     await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end + "&$orderby=start/dateTime asc", config)
          .then(res => {
                      daysEvents = res;
      });
@@ -88,7 +96,14 @@ async function getNextEvent(daysEvents, now, room) {
         const start = moment(now).toISOString();
         const end = moment(now).add("1", "week").toISOString();
 
-        await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end + "&$orderby=start/dateTime asc")
+        let config = {
+            headers: {
+                "Content-Type": "application/json",
+                "Prefer": "outlook.timezone=\"Europe/London\""
+            }
+        };
+
+        await adalApiFetch(axios.get,'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end + "&$orderby=start/dateTime asc", config)
             .then(res => {
                 events = res.data.value;
 
