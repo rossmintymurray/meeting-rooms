@@ -137,11 +137,19 @@ async function getBookUntilTime(now, room) {
 
     const afterTime = moment('18:00', "HH:mm").add(1, "minute");
 
+    let config = {
+        headers: {
+            "Content-Type": "application/json",
+            "Prefer": "outlook.timezone=\"Europe/London\""
+        }
+    };
+
+
     let events = [];
 
     let bookUntil = [];
     //Post data to api
-    await adalApiFetch(axios.get, 'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end + "&$orderby=start/dateTime asc")
+    await adalApiFetch(axios.get, 'https://graph.microsoft.com/v1.0' + getAPIPath(room) + "calendarView?startDateTime=" + start + "&endDateTime=" + end + "&$orderby=start/dateTime asc", config)
         .then(res => {
             events = res.data;
 
