@@ -95,12 +95,12 @@ export default class Calendar extends React.Component {
 
     getRoomName(room) {
         var roomName = [];
-        if (room === "Brewery") {
-            roomName["display"] = "Bre";
-            roomName["organiser"] = "Board Room 3HFM";
-        } else  if (room === "meeting-room") {
-            roomName["display"] = "Meeting Room";
-            roomName["organiser"] = "Meeting Room 3HFM";
+        if (room === "brewery") {
+            roomName["display"] = "Brewery";
+            roomName["organiser"] = "Brewery3";
+        } else  if (room === "stables") {
+            roomName["display"] = "Stables";
+            roomName["organiser"] = "Stables4";
         } else  if (room === "goldfish-bowl") {
             roomName["display"] = "Goldfish Bowl";
             roomName["organiser"] = "Goldfish Bowl";
@@ -245,61 +245,62 @@ export default class Calendar extends React.Component {
 
 
                                 {this.state.next.map((event, i) => {
+                                    if(typeof event !== 'undefined') {
+                                        var startTime = moment(event.start.dateTime);
+                                        var now = moment();
 
-                                    var startTime = moment(event.start.dateTime);
-                                    var now = moment();
+                                        //Check if booked by the room, display 1st attendee if so.
+                                        let nextbookerName = "";
+                                        if (event.organizer.emailAddress.name === this.state.room_name.organiser && event.attendees.length > 0) {
+                                            nextbookerName = event.attendees[0].emailAddress.name;
+                                        } else {
+                                            nextbookerName = event.organizer.emailAddress.name;
+                                        }
 
-                                    //Check if booked by the room, display 1st attendee if so.
-                                    let nextbookerName = "";
-                                    if (event.organizer.emailAddress.name === this.state.room_name.organiser && event.attendees.length > 0) {
-                                        nextbookerName = event.attendees[0].emailAddress.name;
-                                    } else {
-                                        nextbookerName = event.organizer.emailAddress.name;
-                                    }
+                                        if (now.isBefore(startTime)) {
+                                            if (moment(event.start.dateTime).isSame(moment(), 'day')) {
+                                                return (
+                                                    <>
+                                                        <Col xs="7"><h4>{event.subject}</h4></Col>
 
-                                    if (now.isBefore(startTime)) {
-                                        if (moment(event.start.dateTime).isSame(moment(), 'day')) {
-                                            return (
-                                                <>
-                                                    <Col xs="7"><h4>{event.subject}</h4></Col>
+                                                        {/*If start date is not today*/}
 
-                                                    {/*If start date is not today*/}
+                                                        <Col xs="5" className="text-right">
+                                                            <h4>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h4>
+                                                        </Col>
+                                                        <Col xs={12}><h6><span
+                                                            className="light">Booked by</span> {nextbookerName}
+                                                        </h6></Col>
+                                                    </>
+                                                )
+                                            } else {
+                                                return (
+                                                    <>
+                                                        <Col xs="8"><h4>{event.subject}</h4></Col>
 
-                                                    <Col xs="5" className="text-right">
-                                                        <h4>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h4>
-                                                    </Col>
-                                                    <Col xs={12}><h6><span
-                                                        className="light">Booked by</span> {nextbookerName}
-                                                    </h6></Col>
-                                                </>
-                                            )
+                                                        {/*If start date is not today*/}
+
+                                                        <Col xs="4" className="text-right">
+                                                            <h6 className="small next-event-alt-day-date">{getDay(event.start.dateTime)}</h6>
+                                                            <h5>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h5>
+                                                        </Col>
+                                                        <Col xs={12}><h6><span
+                                                            className="light">Booked by</span> {nextbookerName}
+                                                        </h6></Col>
+                                                    </>
+                                                )
+                                            }
                                         } else {
                                             return (
                                                 <>
-                                                    <Col xs="8"><h4>{event.subject}</h4></Col>
-
-                                                    {/*If start date is not today*/}
-
-                                                    <Col xs="4" className="text-right">
-                                                        <h6 className="small next-event-alt-day-date">{getDay(event.start.dateTime)}</h6>
-                                                        <h5>{formatDateTime(event.start.dateTime)} - {formatDateTime(event.end.dateTime)}</h5>
-                                                    </Col>
-                                                    <Col xs={12}><h6><span
-                                                        className="light">Booked by</span> {nextbookerName}
-                                                    </h6></Col>
+                                                    <Col xs="8"><h4>No meetings</h4></Col>
                                                 </>
                                             )
                                         }
-                                    } else {
-                                        return (
-                                            <>
-                                                <Col xs="8"><h4>No meetings</h4></Col>
-                                            </>
-                                        )
                                     }
 
 
-                                })
+                                    })
                                 }
 
 
