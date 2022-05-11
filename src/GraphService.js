@@ -8,9 +8,9 @@ function getAPIPath(room) {
     var email = "";
     //Get email address flr selected room
     if (room === "brewery") {
-        email = "brewery3@aspin4.onmicrosoft.com";
+        email = "brewery3@aspin.co.uk";
     } else  if (room === "stables") {
-        email = "stables4@aspin4.onmicrosoft.com";
+        email = "stables4@aspin.co.uk";
     } else  if (room === "goldfish-bowl") {
         email = "goldfishbowl@aspin4.onmicrosoft.com";
     } else {
