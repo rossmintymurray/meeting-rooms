@@ -13,10 +13,10 @@ function WelcomeContent(props) {
             <div>
                 <Row className="text-center">
                     <Col>
-                        <Link className="btn btn-primary btn-lg" to="/calendar/board-room">Board Room</Link>
+                        <Link className="btn btn-primary btn-lg" to="/calendar/brewery">Brewery</Link>
                     </Col>
                     <Col>
-                        <Link className="btn btn-primary btn-lg" to="/calendar/meeting-room">Meeting Room</Link>
+                        <Link className="btn btn-primary btn-lg" to="/calendar/stables">Stables</Link>
                     </Col>
                     <Col>
                         <Link className="btn btn-primary btn-lg" to="/calendar/goldfish-bowl">Goldfish Bowl</Link>

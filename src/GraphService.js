@@ -7,10 +7,10 @@ axios.defaults.headers.post['Content-Type'] = 'application/json';
 function getAPIPath(room) {
     var email = "";
     //Get email address flr selected room
-    if (room === "board-room") {
-        email = "newconfroom3@aspin4.onmicrosoft.com";
-    } else  if (room === "meeting-room") {
-        email = "oldconfroom3@aspin4.onmicrosoft.com";
+    if (room === "brewery") {
+        email = "brewery3@aspin4.onmicrosoft.com";
+    } else  if (room === "stables") {
+        email = "stables4@aspin4.onmicrosoft.com";
     } else  if (room === "goldfish-bowl") {
         email = "goldfishbowl@aspin4.onmicrosoft.com";
     } else {

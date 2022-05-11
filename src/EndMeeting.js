@@ -103,10 +103,10 @@ export default class EndMeeting extends React.Component {
 
     getRoomName(room) {
         var roomName = "";
-        if (room === "board-room") {
-            roomName = "Board Room";
-        } else  if (room === "meeting-room") {
-            roomName = "Meeting Room";
+        if (room === "brewery") {
+            roomName = "Brewery";
+        } else  if (room === "stables") {
+            roomName = "Stables";
         } else  if (room === "goldfish-bowl") {
             roomName = "Goldfish Bowl";
         } else {

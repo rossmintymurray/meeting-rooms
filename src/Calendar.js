@@ -95,8 +95,8 @@ export default class Calendar extends React.Component {
 
     getRoomName(room) {
         var roomName = [];
-        if (room === "board-room") {
-            roomName["display"] = "Board Room";
+        if (room === "Brewery") {
+            roomName["display"] = "Bre";
             roomName["organiser"] = "Board Room 3HFM";
         } else  if (room === "meeting-room") {
             roomName["display"] = "Meeting Room";
