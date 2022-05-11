@@ -297,6 +297,12 @@ export default class Calendar extends React.Component {
                                                 </>
                                             )
                                         }
+                                    } else {
+                                        return (
+                                            <>
+                                                <Col xs="8"><h4>No meetings</h4></Col>
+                                            </>
+                                        )
                                     }
 
 
