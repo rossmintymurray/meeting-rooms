@@ -104,6 +104,9 @@ export default class Calendar extends React.Component {
         } else  if (room === "goldfish-bowl") {
             roomName["display"] = "Goldfish Bowl";
             roomName["organiser"] = "Goldfish Bowl";
+        } else  if (room === "skylight-room") {
+            roomName["display"] = "Skylight";
+            roomName["organiser"] = "Skylight Room";
         } else {
             return "Error - Unknown Room";
         }

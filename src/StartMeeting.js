@@ -148,6 +148,8 @@ export default class StartMeeting extends React.Component {
             roomName = "Stables";
         } else  if (room === "goldfish-bowl") {
             roomName = "Goldfish Bowl";
+        } else  if (room === "skylight-room") {
+            roomName = "Skylight";
         } else {
             return "Ross Murray 2";
         }

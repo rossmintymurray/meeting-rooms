@@ -13,6 +13,8 @@ function getAPIPath(room) {
         email = "stables4@aspin.co.uk";
     } else  if (room === "goldfish-bowl") {
         email = "goldfishbowl@aspin4.onmicrosoft.com";
+    } else if (room === "skylight-room") {
+        email = "skylightroom@aspin.co.uk";
     } else {
         return "/me/events";
     }

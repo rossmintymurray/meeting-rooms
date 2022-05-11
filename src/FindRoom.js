@@ -23,7 +23,7 @@ export default class FindRoom extends React.Component {
         super(props);
 
         this.state = {
-            rooms: ["brewery", "stables", "goldfish-bowl"],
+            rooms: ["brewery", "stables", "goldfish-bowl", "skylight"],
             freeRooms: [],
             room_name: "",
             loading: true
@@ -55,6 +55,8 @@ export default class FindRoom extends React.Component {
             roomName = "Stables";
         } else  if (room === "goldfish-bowl") {
             roomName = "Goldfish Bowl";
+        } else  if (room === "skylight-room") {
+            roomName = "Skylight";
         } else {
             return "Error - Unknown Room";
         }
